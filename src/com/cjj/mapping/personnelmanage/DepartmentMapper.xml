@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cjj.dao.personnelmanage.DepartmentMapper" >
+  <resultMap id="BaseResultMap" type="com.cjj.po.Department" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="departmentcode" property="departmentcode" jdbcType="VARCHAR" />
+    <result column="departmentname" property="departmentname" jdbcType="VARCHAR" />
+    <result column="pinyincode" property="pinyincode" jdbcType="VARCHAR" />
+    <result column="wubicode" property="wubicode" jdbcType="VARCHAR" />
+    <result column="registersum" property="registersum" jdbcType="DECIMAL" />
+    <result column="site" property="site" jdbcType="VARCHAR" />
+    <result column="isregister" property="isregister" jdbcType="INTEGER" />
+    <result column="isvalid" property="isvalid" jdbcType="INTEGER" />
+    <result column="note" property="note" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, departmentcode, departmentname, pinyincode, wubicode, registersum, site, isregister, 
+    isvalid, note
+  </sql>
+  
+  <select id="findAll" resultMap="BaseResultMap">
+    SELECT * FROM department WHERE isvalid = 1
+  </select>
+  <select id="findIsRgs" resultMap="BaseResultMap">
+  	SELECT * FROM department WHERE isvalid = 1 AND isregister = 1
+  </select>
+  
+  <select id="findDptByPid" resultMap="BaseResultMap">
+  	SELECT d.* FROM department d WHERE d.isvalid = 1 AND 
+	IF(
+	(SELECT COUNT(0) FROM role r WHERE FIND_IN_SET(#{id,jdbcType=INTEGER},r.positionid) AND r.rolename = '门诊医生') &gt; 0,
+	isregister = (SELECT COUNT(0) FROM role r WHERE FIND_IN_SET(#{id,jdbcType=INTEGER},r.positionid) AND r.rolename = '门诊医生'), 1+1=2
+	)
+  </select>
+  <select id="findLastCode" resultMap="BaseResultMap">
+  	SELECT departmentcode FROM department WHERE isvalid = 1 ORDER BY id DESC LIMIT 1
+  </select>
+  
+  <select id="vagueFind" resultMap="BaseResultMap">
+  	SELECT * FROM department WHERE isvalid = 1 AND (LOCATE(#{contant,jdbcType=VARCHAR},departmentname)
+  	OR LOCATE(#{contant,jdbcType=VARCHAR},pinyincode) OR LOCATE(#{contant,jdbcType=VARCHAR},departmentcode))
+  	<if test="currentpage==0">
+		limit 0, #{pagesize,jdbcType=INTEGER}
+	</if>
+	<if test="currentpage&gt;0">
+		limit ${(currentpage-1)*pagesize},${pagesize}
+	</if>
+  </select>
+  
+  <update id="delete" parameterType="java.lang.Integer" >
+    UPDATE department SET isvalid = 2 WHERE id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from department
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <insert id="insert" parameterType="com.cjj.po.Department" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into department (departmentcode, departmentname, pinyincode, 
+      wubicode, registersum, site, 
+      isregister, isvalid, note
+      )
+    values (#{departmentcode,jdbcType=VARCHAR}, #{departmentname,jdbcType=VARCHAR}, #{pinyincode,jdbcType=VARCHAR}, 
+      #{wubicode,jdbcType=VARCHAR}, #{registersum,jdbcType=DECIMAL}, #{site,jdbcType=VARCHAR}, 
+      #{isregister,jdbcType=INTEGER}, #{isvalid,jdbcType=INTEGER}, #{note,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cjj.po.Department" >
+    update department
+    <set >
+      <if test="departmentcode != null" >
+        departmentcode = #{departmentcode,jdbcType=VARCHAR},
+      </if>
+      <if test="departmentname != null" >
+        departmentname = #{departmentname,jdbcType=VARCHAR},
+      </if>
+      <if test="pinyincode != null" >
+        pinyincode = #{pinyincode,jdbcType=VARCHAR},
+      </if>
+      <if test="wubicode != null" >
+        wubicode = #{wubicode,jdbcType=VARCHAR},
+      </if>
+      <if test="registersum != null" >
+        registersum = #{registersum,jdbcType=DECIMAL},
+      </if>
+      <if test="site != null" >
+        site = #{site,jdbcType=VARCHAR},
+      </if>
+      <if test="isregister != null" >
+        isregister = #{isregister,jdbcType=INTEGER},
+      </if>
+      <if test="isvalid != null" >
+        isvalid = #{isvalid,jdbcType=INTEGER},
+      </if>
+      <if test="note != null" >
+        note = #{note,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

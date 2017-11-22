@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cjj.dao.doctorworkstation.PrescriptiontemplateMapper" >
+  <resultMap id="BaseResultMap" type="com.cjj.po.Prescriptiontemplate" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="templatename" property="templatename" jdbcType="VARCHAR" />
+    <result column="doctorid" property="doctorid" jdbcType="INTEGER" />
+    <result column="natureid" property="natureid" jdbcType="INTEGER" />
+    <result column="prescriptiontypeid" property="prescriptiontypeid" jdbcType="INTEGER" />
+    <result column="classifyid" property="classifyid" jdbcType="INTEGER" />
+    <result column="note" property="note" jdbcType="VARCHAR" />
+    <result column="diagnosis" property="diagnosis" jdbcType="VARCHAR" />
+    <result column="isvalid" property="isvalid" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, templatename, doctorid, natureid, prescriptiontypeid, classifyid, note, diagnosis, 
+    isvalid
+  </sql>
+  
+  <select id="manyConditionsFind" resultType="com.cjj.vo.PrescriptiontemplateVo">
+  	SELECT p.*,e.employeename,d.departmentname,a1.detailname AS naturename,a2.detailname AS prescriptiontypename,
+	a3.detailname AS classifyname FROM prescriptiontemplate p LEFT JOIN employee e ON e.id = p.doctorid 
+	LEFT JOIN department d ON d.id = e.departmentid LEFT JOIN attributedetail a1 ON a1.id = p.natureid 
+	LEFT JOIN attributedetail a2 ON a2.id = p.prescriptiontypeid LEFT JOIN attributedetail a3 ON a3.id = p.classifyid 
+	WHERE p.isvalid = 1 AND LOCATE(#{vo.templatename,jdbcType=VARCHAR},templatename) AND LOCATE(#{vo.diagnosis,jdbcType=VARCHAR},diagnosis) 
+	AND LOCATE(CASE WHEN #{vo.prescriptiontypeid,jdbcType=INTEGER} = 0 THEN '' ELSE #{vo.prescriptiontypeid,jdbcType=INTEGER} END,p.prescriptiontypeid) 
+	AND LOCATE(CASE WHEN #{vo.doctorid,jdbcType=INTEGER} = 0 THEN '' ELSE #{vo.doctorid,jdbcType=INTEGER} END,p.doctorid) 
+	AND LOCATE(CASE WHEN #{vo.departmentid,jdbcType=INTEGER} = 0 THEN '' ELSE #{vo.departmentid,jdbcType=INTEGER} END,e.departmentid)
+	<if test="currentpage==0">
+		limit 0, #{pagesize,jdbcType=INTEGER}
+	</if>
+	<if test="currentpage&gt;0">
+		limit ${(currentpage-1)*pagesize},${pagesize}
+	</if>
+  </select>
+  <select id="vagueFind" resultType="com.cjj.vo.PrescriptiontemplateVo">
+  	SELECT p.*,e.employeename,d.departmentname,a1.detailname AS naturename,a2.detailname AS prescriptiontypename,
+	a3.detailname AS classifyname FROM prescriptiontemplate p LEFT JOIN employee e ON e.id = p.doctorid 
+	LEFT JOIN department d ON d.id = e.departmentid LEFT JOIN attributedetail a1 ON a1.id = p.natureid 
+	LEFT JOIN attributedetail a2 ON a2.id = p.prescriptiontypeid LEFT JOIN attributedetail a3 ON a3.id = p.classifyid 
+	WHERE p.isvalid = 1 AND (LOCATE(#{contant,jdbcType=VARCHAR},p.templatename) OR LOCATE(#{contant,jdbcType=VARCHAR},p.diagnosis) 
+	OR LOCATE(#{contant,jdbcType=VARCHAR},d.departmentname) OR LOCATE(#{contant,jdbcType=VARCHAR},a2.detailname))
+  </select>
+  <select id="findmaxid" resultType="java.lang.Integer">
+  	SELECT MAX(id) FROM prescriptiontemplate
+  </select>
+  <select id="findByid" resultType="com.cjj.vo.PrescriptiontemplateVo">
+  	SELECT p.*,d.departmentname FROM prescriptiontemplate p LEFT JOIN employee e ON e.id = p.doctorid 
+	LEFT JOIN department d ON d.id = e.departmentid WHERE p.isvalid = 1 AND p.id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="findRepetitionByName" resultMap="BaseResultMap">
+  	SELECT * FROM prescriptiontemplate WHERE templatename = #{templatename,jdbcType=VARCHAR}
+  </select>
+  <update id="delete" parameterType="java.lang.Integer">
+  	UPDATE prescriptiontemplate SET isvalid = 2 WHERE id = #{id,jdbcType=INTEGER}
+  </update>
+  <insert id="insert" parameterType="com.cjj.po.Prescriptiontemplate" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into prescriptiontemplate (templatename, doctorid, natureid, 
+      prescriptiontypeid, classifyid, note, 
+      diagnosis, isvalid)
+    values (#{templatename,jdbcType=VARCHAR}, #{doctorid,jdbcType=INTEGER}, #{natureid,jdbcType=INTEGER}, 
+      #{prescriptiontypeid,jdbcType=INTEGER}, #{classifyid,jdbcType=INTEGER}, #{note,jdbcType=VARCHAR}, 
+      #{diagnosis,jdbcType=VARCHAR}, #{isvalid,jdbcType=INTEGER})
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cjj.po.Prescriptiontemplate" >
+    update prescriptiontemplate
+    <set >
+      <if test="templatename != null" >
+        templatename = #{templatename,jdbcType=VARCHAR},
+      </if>
+      <if test="doctorid != null" >
+        doctorid = #{doctorid,jdbcType=INTEGER},
+      </if>
+      <if test="natureid != null" >
+        natureid = #{natureid,jdbcType=INTEGER},
+      </if>
+      <if test="prescriptiontypeid != null" >
+        prescriptiontypeid = #{prescriptiontypeid,jdbcType=INTEGER},
+      </if>
+      <if test="classifyid != null" >
+        classifyid = #{classifyid,jdbcType=INTEGER},
+      </if>
+      <if test="note != null" >
+        note = #{note,jdbcType=VARCHAR},
+      </if>
+      <if test="diagnosis != null" >
+        diagnosis = #{diagnosis,jdbcType=VARCHAR},
+      </if>
+      <if test="isvalid != null" >
+        isvalid = #{isvalid,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

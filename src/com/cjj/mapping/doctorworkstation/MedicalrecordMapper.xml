@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cjj.dao.doctorworkstation.MedicalrecordMapper" >
+  <resultMap id="BaseResultMap" type="com.cjj.po.Medicalrecord" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="registerid" property="registerid" jdbcType="INTEGER" />
+    <result column="medicalrecordcode" property="medicalrecordcode" jdbcType="VARCHAR" />
+    <result column="medicalrecordname" property="medicalrecordname" jdbcType="VARCHAR" />
+    <result column="doctorid" property="doctorid" jdbcType="INTEGER" />
+    <result column="diseaseid" property="diseaseid" jdbcType="INTEGER" />
+    <result column="note" property="note" jdbcType="VARCHAR" />
+    <result column="patientappeal" property="patientappeal" jdbcType="VARCHAR" />
+    <result column="medicalhistory" property="medicalhistory" jdbcType="VARCHAR" />
+    <result column="physicalstatus" property="physicalstatus" jdbcType="VARCHAR" />
+    <result column="primarydiagnosis" property="primarydiagnosis" jdbcType="VARCHAR" />
+    <result column="opinion" property="opinion" jdbcType="VARCHAR" />
+    <result column="recordtime" property="recordtime" jdbcType="TIMESTAMP" />
+    <result column="isvalid" property="isvalid" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, registerid, medicalrecordcode, medicalrecordname, doctorid, diseaseid, note, 
+    patientappeal, medicalhistory, physicalstatus, primarydiagnosis, opinion, recordtime, 
+    isvalid
+  </sql>
+  
+  <select id="manyConditionsFind" resultType="com.cjj.vo.MedicalrecordVo">
+    SELECT m.*,r.registercode,p.cardcode,p.patientname,e.employeename,dt.departmentname,d.diseasename 
+	FROM medicalrecord m LEFT JOIN register r ON r.id = m.registerid 
+	LEFT JOIN patient p ON p.id = r.patientid LEFT JOIN employee e ON e.id = m.doctorid 
+	LEFT JOIN department dt ON dt.id = e.departmentid LEFT JOIN disease d ON d.id = m.diseaseid 
+	WHERE m.isvalid = 1 AND R.isvalid = 1 AND LOCATE(#{vo.cardcode,jdbcType=VARCHAR}, cardcode) AND 
+	LOCATE(#{vo.patientname,jdbcType=VARCHAR},patientname) AND LOCATE(#{vo.medicalrecordname,jdbcType=VARCHAR},medicalrecordname) 
+	AND LOCATE(CASE WHEN #{vo.doctorid,jdbcType=INTEGER} = 0 THEN '' ELSE #{vo.doctorid,jdbcType=INTEGER} END,m.doctorid)
+	AND LOCATE(CASE WHEN #{vo.departmentid,jdbcType=INTEGER} = 0 THEN '' ELSE #{vo.departmentid,jdbcType=INTEGER} END,dt.id)
+	<if test="currentpage==0">
+		limit 0, #{pagesize,jdbcType=INTEGER}
+	</if>
+	<if test="currentpage&gt;0">
+		limit ${(currentpage-1)*pagesize},${pagesize}
+	</if>
+  </select>
+  <select id="findRepetition" resultMap="BaseResultMap">
+  	SELECT * FROM medicalrecord WHERE medicalrecordcode = #{medicalrecordcode,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from medicalrecord
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <insert id="insert" parameterType="com.cjj.po.Medicalrecord" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into medicalrecord (registerid, medicalrecordcode, medicalrecordname, 
+      doctorid, diseaseid, note, 
+      patientappeal, medicalhistory, physicalstatus, 
+      primarydiagnosis, opinion, recordtime, 
+      isvalid)
+    values (#{registerid,jdbcType=INTEGER}, #{medicalrecordcode,jdbcType=VARCHAR}, #{medicalrecordname,jdbcType=VARCHAR}, 
+      #{doctorid,jdbcType=INTEGER}, #{diseaseid,jdbcType=INTEGER}, #{note,jdbcType=VARCHAR}, 
+      #{patientappeal,jdbcType=VARCHAR}, #{medicalhistory,jdbcType=VARCHAR}, #{physicalstatus,jdbcType=VARCHAR}, 
+      #{primarydiagnosis,jdbcType=VARCHAR}, #{opinion,jdbcType=VARCHAR}, #{recordtime,jdbcType=TIMESTAMP}, 
+      #{isvalid,jdbcType=INTEGER})
+  </insert>
+  <update id="delete" parameterType="java.lang.Integer" >
+    UPDATE medicalrecord SET isvalid = 2 WHERE id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cjj.po.Medicalrecord" >
+    update medicalrecord
+    <set >
+      <if test="registerid != null" >
+        registerid = #{registerid,jdbcType=INTEGER},
+      </if>
+      <if test="medicalrecordcode != null" >
+        medicalrecordcode = #{medicalrecordcode,jdbcType=VARCHAR},
+      </if>
+      <if test="medicalrecordname != null" >
+        medicalrecordname = #{medicalrecordname,jdbcType=VARCHAR},
+      </if>
+      <if test="doctorid != null" >
+        doctorid = #{doctorid,jdbcType=INTEGER},
+      </if>
+      <if test="diseaseid != null" >
+        diseaseid = #{diseaseid,jdbcType=INTEGER},
+      </if>
+      <if test="note != null" >
+        note = #{note,jdbcType=VARCHAR},
+      </if>
+      <if test="patientappeal != null" >
+        patientappeal = #{patientappeal,jdbcType=VARCHAR},
+      </if>
+      <if test="medicalhistory != null" >
+        medicalhistory = #{medicalhistory,jdbcType=VARCHAR},
+      </if>
+      <if test="physicalstatus != null" >
+        physicalstatus = #{physicalstatus,jdbcType=VARCHAR},
+      </if>
+      <if test="primarydiagnosis != null" >
+        primarydiagnosis = #{primarydiagnosis,jdbcType=VARCHAR},
+      </if>
+      <if test="opinion != null" >
+        opinion = #{opinion,jdbcType=VARCHAR},
+      </if>
+      <if test="recordtime != null" >
+        recordtime = #{recordtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isvalid != null" >
+        isvalid = #{isvalid,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

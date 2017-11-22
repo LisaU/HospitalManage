@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cjj.dao.registermanage.PatientMapper" >
+  <resultMap id="BaseResultMap" type="com.cjj.po.Patient" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="cardcode" property="cardcode" jdbcType="VARCHAR" />
+    <result column="patientname" property="patientname" jdbcType="VARCHAR" />
+    <result column="sex" property="sex" jdbcType="INTEGER" />
+    <result column="maritalstatusid" property="maritalstatusid" jdbcType="INTEGER" />
+    <result column="job" property="job" jdbcType="VARCHAR" />
+    <result column="patienttypeid" property="patienttypeid" jdbcType="INTEGER" />
+    <result column="age" property="age" jdbcType="INTEGER" />
+    <result column="insuretypeid" property="insuretypeid" jdbcType="INTEGER" />
+    <result column="medicarecode" property="medicarecode" jdbcType="VARCHAR" />
+    <result column="viptypeid" property="viptypeid" jdbcType="INTEGER" />
+    <result column="tel" property="tel" jdbcType="VARCHAR" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="taboo" property="taboo" jdbcType="VARCHAR" />
+    <result column="drugallergyhistory" property="drugallergyhistory" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, cardcode, patientname, sex, maritalstatusid, job, patienttypeid, age, insuretypeid, 
+    medicarecode, viptypeid, tel, address, taboo, drugallergyhistory
+  </sql>
+  
+  <select id="findAll" resultType="com.cjj.vo.PatientVo">
+  	SELECT p.*,pt.typename AS patienttypename,v.typename AS viptypename,a.detailname AS maritalstatusname,a1.detailname AS insuretypename 
+	FROM patient p INNER JOIN patienttype pt ON pt.id = p.patienttypeid INNER JOIN viptype v ON v.id = p.viptypeid 
+	INNER JOIN attributedetail a ON a.id = p.maritalstatusid INNER JOIN attributedetail a1 ON a1.id = p.insuretypeid
+  </select>
+  <select id="vagueFind" resultType="com.cjj.vo.PatientVo">
+  	SELECT p.*,pt.typename AS patienttypename,v.typename AS viptypename,a.detailname AS maritalstatusname,a1.detailname AS insuretypename 
+	FROM patient p INNER JOIN patienttype pt ON pt.id = p.patienttypeid INNER JOIN viptype v ON v.id = p.viptypeid 
+	INNER JOIN attributedetail a ON a.id = p.maritalstatusid INNER JOIN attributedetail a1 ON a1.id = p.insuretypeid 
+	WHERE LOCATE(#{patientname,jdbcType=VARCHAR},p.patientname) OR LOCATE(#{cardcode,jdbcType=VARCHAR},p.cardcode)
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from patient
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <insert id="insert" parameterType="com.cjj.po.Patient" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into patient (cardcode, patientname, sex, 
+      maritalstatusid, job, patienttypeid, 
+      age, insuretypeid, medicarecode, 
+      viptypeid, tel, address, 
+      taboo, drugallergyhistory)
+    values (#{cardcode,jdbcType=VARCHAR}, #{patientname,jdbcType=VARCHAR}, #{sex,jdbcType=INTEGER}, 
+      #{maritalstatusid,jdbcType=INTEGER}, #{job,jdbcType=VARCHAR}, #{patienttypeid,jdbcType=INTEGER}, 
+      #{age,jdbcType=INTEGER}, #{insuretypeid,jdbcType=INTEGER}, #{medicarecode,jdbcType=VARCHAR}, 
+      #{viptypeid,jdbcType=INTEGER}, #{tel,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, 
+      #{taboo,jdbcType=VARCHAR}, #{drugallergyhistory,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cjj.po.Patient" >
+    update patient
+    <set >
+      <if test="cardcode != null" >
+        cardcode = #{cardcode,jdbcType=VARCHAR},
+      </if>
+      <if test="patientname != null" >
+        patientname = #{patientname,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null" >
+        sex = #{sex,jdbcType=INTEGER},
+      </if>
+      <if test="maritalstatusid != null" >
+        maritalstatusid = #{maritalstatusid,jdbcType=INTEGER},
+      </if>
+      <if test="job != null" >
+        job = #{job,jdbcType=VARCHAR},
+      </if>
+      <if test="patienttypeid != null" >
+        patienttypeid = #{patienttypeid,jdbcType=INTEGER},
+      </if>
+      <if test="age != null" >
+        age = #{age,jdbcType=INTEGER},
+      </if>
+      <if test="insuretypeid != null" >
+        insuretypeid = #{insuretypeid,jdbcType=INTEGER},
+      </if>
+      <if test="medicarecode != null" >
+        medicarecode = #{medicarecode,jdbcType=VARCHAR},
+      </if>
+      <if test="viptypeid != null" >
+        viptypeid = #{viptypeid,jdbcType=INTEGER},
+      </if>
+      <if test="tel != null" >
+        tel = #{tel,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="taboo != null" >
+        taboo = #{taboo,jdbcType=VARCHAR},
+      </if>
+      <if test="drugallergyhistory != null" >
+        drugallergyhistory = #{drugallergyhistory,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

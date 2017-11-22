@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cjj.dao.registermanage.RegisterMapper" >
+  <resultMap id="BaseResultMap" type="com.cjj.po.Register" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="patientid" property="patientid" jdbcType="INTEGER" />
+    <result column="registertypeid" property="registertypeid" jdbcType="INTEGER" />
+    <result column="registercode" property="registercode" jdbcType="VARCHAR" />
+    <result column="departmentid" property="departmentid" jdbcType="INTEGER" />
+    <result column="doctorid" property="doctorid" jdbcType="INTEGER" />
+    <result column="registersum" property="registersum" jdbcType="DECIMAL" />
+    <result column="registertime" property="registertime" jdbcType="TIMESTAMP" />
+    <result column="registerstatus" property="registerstatus" jdbcType="INTEGER" />
+    <result column="registerpersonid" property="registerpersonid" jdbcType="INTEGER" />
+    <result column="isvalid" property="isvalid" jdbcType="INTEGER" />
+    <result column="note" property="note" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, patientid, registertypeid, registercode, departmentid, doctorid, registersum, 
+    registertime, registerstatus, registerpersonid, isvalid, note
+  </sql>
+  
+  <select id="pageFindToday" resultType="com.cjj.vo.RegisterVo">
+  	SELECT r.*,p.cardcode,p.patientname,CASE WHEN r.registertypeid = 0 THEN '自定义' ELSE rt.typename END AS typename,
+	rt.typesum,d.departmentname,e.employeename AS doctorname,e1.employeename AS registerpersonname FROM register r 
+	LEFT JOIN patient p ON p.id = r.patientid LEFT JOIN registertype rt ON rt.id = r.registertypeid 
+	LEFT JOIN department d ON d.id = r.departmentid LEFT JOIN employee e ON e.id = r.doctorid 
+	LEFT JOIN employee e1 ON e1.id = r.registerpersonid WHERE r.isvalid = 1 and registertime BETWEEN CURRENT_DATE 
+	AND DATE_ADD(CURRENT_DATE, INTERVAL 1 DAY) ORDER BY id DESC
+	<if test="currentpage==0">
+		limit 0, #{pagesize,jdbcType=INTEGER}
+	</if>
+	<if test="currentpage&gt;0">
+		limit ${(currentpage-1)*pagesize},${pagesize}
+	</if>
+  </select>
+  <select id="findAll" resultType="com.cjj.vo.RegisterVo">
+    SELECT r.*,p.cardcode,p.patientname,CASE WHEN r.registertypeid = 0 THEN '自定义' ELSE rt.typename END AS typename,
+	rt.typesum,d.departmentname,e.employeename AS doctorname,e1.employeename AS registerpersonname FROM register r 
+	LEFT JOIN patient p ON p.id = r.patientid LEFT JOIN registertype rt ON rt.id = r.registertypeid 
+	LEFT JOIN department d ON d.id = r.departmentid LEFT JOIN employee e ON e.id = r.doctorid 
+	LEFT JOIN employee e1 ON e1.id = r.registerpersonid WHERE r.isvalid = 1
+  </select>
+  <select id="findLast" resultType="com.cjj.vo.RegisterVo">
+    SELECT r.*,p.cardcode,p.patientname,CASE WHEN r.registertypeid = 0 THEN '自定义' ELSE rt.typename END AS typename,
+	rt.typesum,d.departmentname,e.employeename AS doctorname,e1.employeename AS registerpersonname FROM register r 
+	LEFT JOIN patient p ON p.id = r.patientid LEFT JOIN registertype rt ON rt.id = r.registertypeid 
+	LEFT JOIN department d ON d.id = r.departmentid LEFT JOIN employee e ON e.id = r.doctorid 
+	LEFT JOIN employee e1 ON e1.id = r.registerpersonid WHERE r.isvalid = 1 and registertime BETWEEN CURRENT_DATE 
+	AND DATE_ADD(CURRENT_DATE, INTERVAL 1 DAY) ORDER BY r.id DESC LIMIT 1
+  </select>
+  <select id="countInfo" resultType="com.cjj.vo.RegisterVo">
+    SELECT SUM(registersum) AS sumregistersum, COUNT(*) AS countregister FROM register WHERE isvalid=1 AND registertime 
+    BETWEEN CURRENT_DATE AND DATE_ADD(CURRENT_DATE, INTERVAL 1 DAY)
+  </select>
+  <select id="vagueFind" resultType="com.cjj.vo.RegisterVo">
+	SELECT r.*,p.*,a.detailname AS insuretypename,CASE WHEN r.registertypeid = 0 THEN '自定义' ELSE rt.typename END AS typename,
+	rt.typesum,d.departmentname,e.employeename AS doctorname,e1.employeename AS registerpersonname FROM register r 
+	LEFT JOIN patient p ON p.id = r.patientid LEFT JOIN registertype rt ON rt.id = r.registertypeid 
+	LEFT JOIN department d ON d.id = r.departmentid LEFT JOIN employee e ON e.id = r.doctorid 
+	LEFT JOIN employee e1 ON e1.id = r.registerpersonid LEFT JOIN attributedetail a ON a.id = p.insuretypeid 
+	WHERE r.isvalid = 1 AND registerstatus = #{registerstatus,jdbcType=INTEGER} AND (LOCATE(#{cardcode,jdbcType=VARCHAR},cardcode) 
+	OR LOCATE(#{patientname,jdbcType=VARCHAR},patientname))
+  </select>
+  <select id="manyConditionsFindhistory" resultType="com.cjj.vo.RegisterVo">
+	SELECT r.*,p.*,a.detailname AS insuretypename,CASE WHEN r.registertypeid = 0 THEN '自定义' ELSE rt.typename END AS typename,
+	rt.typesum,d.departmentname,e.employeename AS doctorname,e1.employeename AS registerpersonname FROM register r 
+	LEFT JOIN patient p ON p.id = r.patientid LEFT JOIN registertype rt ON rt.id = r.registertypeid 
+	LEFT JOIN department d ON d.id = r.departmentid LEFT JOIN employee e ON e.id = r.doctorid 
+	LEFT JOIN employee e1 ON e1.id = r.registerpersonid LEFT JOIN attributedetail a ON a.id = p.insuretypeid 
+	WHERE r.isvalid = 1 AND LOCATE(#{vo.cardcode,jdbcType=VARCHAR},cardcode) AND LOCATE(#{vo.patientname,jdbcType=VARCHAR},patientname) AND 
+	LOCATE((CASE WHEN #{vo.registerpersonid,jdbcType=INTEGER} = 0 THEN '' ELSE #{vo.registerpersonid,jdbcType=INTEGER} END),registerpersonid) AND 
+	LOCATE((CASE WHEN #{vo.registerstatus,jdbcType=INTEGER} = 0 THEN '' ELSE #{vo.registerstatus,jdbcType=INTEGER} END),registerstatus) AND 
+	UNIX_TIMESTAMP(registertime) &gt;= UNIX_TIMESTAMP(CASE WHEN #{vo.begintime,jdbcType=VARCHAR} = '' THEN 
+	registertime ELSE #{vo.begintime,jdbcType=VARCHAR} END) AND 
+	UNIX_TIMESTAMP (registertime) &lt;= UNIX_TIMESTAMP(CASE WHEN #{vo.endtime,jdbcType=VARCHAR} = '' THEN 
+	registertime ELSE DATE_ADD(#{vo.endtime,jdbcType=VARCHAR},INTERVAL 1 DAY) END) ORDER BY r.id DESC
+	<if test="currentpage==0">
+		limit 0, #{pagesize,jdbcType=INTEGER}
+	</if>
+	<if test="currentpage&gt;0">
+		limit ${(currentpage-1)*pagesize},${pagesize}
+	</if>
+  </select>
+  <select id="findByid" resultType="com.cjj.vo.RegisterVo">
+  	SELECT r.*,p.*,a.detailname AS insuretypename,CASE WHEN r.registertypeid = 0 THEN '自定义' ELSE rt.typename END AS typename,
+	rt.typesum,d.departmentname,e.employeename AS doctorname,e1.employeename AS registerpersonname FROM register r 
+	LEFT JOIN patient p ON p.id = r.patientid LEFT JOIN registertype rt ON rt.id = r.registertypeid 
+	LEFT JOIN department d ON d.id = r.departmentid LEFT JOIN employee e ON e.id = r.doctorid 
+	LEFT JOIN employee e1 ON e1.id = r.registerpersonid LEFT JOIN attributedetail a ON a.id = p.insuretypeid 
+	WHERE r.id = #{id,jdbcType=INTEGER}
+  </select>
+  <update id="delete" parameterType="java.lang.Integer">
+  	UPDATE register SET isvalid = 2 WHERE id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updatestatus" parameterType="com.cjj.po.Register">
+  	UPDATE register SET registerstatus = #{registerstatus,jdbcType=INTEGER} WHERE id = #{id,jdbcType=INTEGER}
+  </update>
+  <insert id="insert" parameterType="com.cjj.po.Register" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into register (patientid, registertypeid, registercode, 
+      departmentid, doctorid, registersum, 
+      registertime, registerstatus, registerpersonid, 
+      isvalid, note)
+    values (#{patientid,jdbcType=INTEGER}, #{registertypeid,jdbcType=INTEGER}, #{registercode,jdbcType=VARCHAR}, 
+      #{departmentid,jdbcType=INTEGER}, #{doctorid,jdbcType=INTEGER}, #{registersum,jdbcType=DECIMAL}, 
+      #{registertime,jdbcType=TIMESTAMP}, #{registerstatus,jdbcType=INTEGER}, #{registerpersonid,jdbcType=INTEGER}, 
+      #{isvalid,jdbcType=INTEGER}, #{note,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cjj.po.Register" >
+    update register
+    <set >
+      <if test="patientid != null" >
+        patientid = #{patientid,jdbcType=INTEGER},
+      </if>
+      <if test="registertypeid != null" >
+        registertypeid = #{registertypeid,jdbcType=INTEGER},
+      </if>
+      <if test="registercode != null" >
+        registercode = #{registercode,jdbcType=VARCHAR},
+      </if>
+      <if test="departmentid != null" >
+        departmentid = #{departmentid,jdbcType=INTEGER},
+      </if>
+      <if test="doctorid != null" >
+        doctorid = #{doctorid,jdbcType=INTEGER},
+      </if>
+      <if test="registersum != null" >
+        registersum = #{registersum,jdbcType=DECIMAL},
+      </if>
+      <if test="registertime != null" >
+        registertime = #{registertime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="registerstatus != null" >
+        registerstatus = #{registerstatus,jdbcType=INTEGER},
+      </if>
+      <if test="registerpersonid != null" >
+        registerpersonid = #{registerpersonid,jdbcType=INTEGER},
+      </if>
+      <if test="isvalid != null" >
+        isvalid = #{isvalid,jdbcType=INTEGER},
+      </if>
+      <if test="note != null" >
+        note = #{note,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

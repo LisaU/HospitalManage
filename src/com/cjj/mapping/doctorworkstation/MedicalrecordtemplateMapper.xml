@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cjj.dao.doctorworkstation.MedicalrecordtemplateMapper" >
+  <resultMap id="BaseResultMap" type="com.cjj.po.Medicalrecordtemplate" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="templatecode" property="templatecode" jdbcType="VARCHAR" />
+    <result column="templatename" property="templatename" jdbcType="VARCHAR" />
+    <result column="doctorid" property="doctorid" jdbcType="INTEGER" />
+    <result column="diseaseid" property="diseaseid" jdbcType="INTEGER" />
+    <result column="fitstatus" property="fitstatus" jdbcType="VARCHAR" />
+    <result column="note" property="note" jdbcType="VARCHAR" />
+    <result column="patientappeal" property="patientappeal" jdbcType="VARCHAR" />
+    <result column="medicalhistory" property="medicalhistory" jdbcType="VARCHAR" />
+    <result column="physicalstatus" property="physicalstatus" jdbcType="VARCHAR" />
+    <result column="primarydiagnosis" property="primarydiagnosis" jdbcType="VARCHAR" />
+    <result column="opinion" property="opinion" jdbcType="VARCHAR" />
+    <result column="isvalid" property="isvalid" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, templatecode, templatename, doctorid, diseaseid, fitstatus, note, patientappeal, 
+    medicalhistory, physicalstatus, primarydiagnosis, opinion, isvalid
+  </sql>
+  
+  <select id="manyConditionsFind" resultType="com.cjj.vo.MedicalrecordtemplateVo">
+  	SELECT m.*, e.employeename,dt.departmentname,d.diseasename FROM medicalrecordtemplate m 
+	LEFT JOIN employee e ON e.id = m.doctorid LEFT JOIN department dt ON dt.id = e.departmentid 
+	LEFT JOIN disease d ON d.id = m.diseaseid WHERE m.isvalid = 1 
+	AND LOCATE(#{vo.templatecode,jdbcType=VARCHAR}, templatecode) AND LOCATE(#{vo.templatename,jdbcType=VARCHAR},templatename) 
+	AND LOCATE(CASE WHEN #{vo.doctorid,jdbcType=INTEGER} = 0 THEN '' ELSE #{vo.doctorid,jdbcType=INTEGER} END,doctorid) 
+	AND LOCATE(CASE WHEN #{vo.departmentid,jdbcType=INTEGER} = 0 THEN '' ELSE #{vo.departmentid,jdbcType=INTEGER} END,dt.id) 
+	AND LOCATE(#{vo.fitstatus,jdbcType=VARCHAR},fitstatus)
+	<if test="currentpage==0">
+		limit 0, #{pagesize,jdbcType=INTEGER}
+	</if>
+	<if test="currentpage&gt;0">
+		limit ${(currentpage-1)*pagesize},${pagesize}
+	</if>
+  </select>
+  <select id="findRepetitionByCode" resultMap="BaseResultMap">
+  	SELECT * FROM medicalrecordtemplate WHERE templatecode = #{templatecode,jdbcType=VARCHAR}
+  </select>
+  <select id="vagueFind" resultType="com.cjj.vo.MedicalrecordtemplateVo">
+  	SELECT m.*, e.employeename,dt.departmentname,d.diseasename FROM medicalrecordtemplate m 
+	LEFT JOIN employee e ON e.id = m.doctorid LEFT JOIN department dt ON dt.id = e.departmentid 
+	LEFT JOIN disease d ON d.id = m.diseaseid WHERE m.isvalid = 1 
+	AND (LOCATE(#{contant,jdbcType=VARCHAR}, templatecode) OR LOCATE(#{contant,jdbcType=VARCHAR},templatename) 
+	OR LOCATE(#{contant,jdbcType=VARCHAR},e.employeename) OR LOCATE(#{contant,jdbcType=VARCHAR},dt.departmentname) 
+	OR LOCATE(#{contant,jdbcType=VARCHAR},fitstatus))
+  </select>
+  <update id="delete" parameterType="java.lang.Integer" >
+    UPDATE medicalrecordtemplate SET isvalid = 2 WHERE id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="findRepetitionByName" resultMap="BaseResultMap">
+  	SELECT * FROM medicalrecordtemplate WHERE templatename = #{templatename,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from medicalrecordtemplate
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <insert id="insert" parameterType="com.cjj.po.Medicalrecordtemplate" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into medicalrecordtemplate (templatecode, templatename, doctorid, 
+      diseaseid, fitstatus, note, 
+      patientappeal, medicalhistory, physicalstatus, 
+      primarydiagnosis, opinion, isvalid
+      )
+    values (#{templatecode,jdbcType=VARCHAR}, #{templatename,jdbcType=VARCHAR}, #{doctorid,jdbcType=INTEGER}, 
+      #{diseaseid,jdbcType=INTEGER}, #{fitstatus,jdbcType=VARCHAR}, #{note,jdbcType=VARCHAR}, 
+      #{patientappeal,jdbcType=VARCHAR}, #{medicalhistory,jdbcType=VARCHAR}, #{physicalstatus,jdbcType=VARCHAR}, 
+      #{primarydiagnosis,jdbcType=VARCHAR}, #{opinion,jdbcType=VARCHAR}, #{isvalid,jdbcType=INTEGER}
+      )
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cjj.po.Medicalrecordtemplate" >
+    update medicalrecordtemplate
+    <set >
+      <if test="templatecode != null" >
+        templatecode = #{templatecode,jdbcType=VARCHAR},
+      </if>
+      <if test="templatename != null" >
+        templatename = #{templatename,jdbcType=VARCHAR},
+      </if>
+      <if test="doctorid != null" >
+        doctorid = #{doctorid,jdbcType=INTEGER},
+      </if>
+      <if test="diseaseid != null" >
+        diseaseid = #{diseaseid,jdbcType=INTEGER},
+      </if>
+      <if test="fitstatus != null" >
+        fitstatus = #{fitstatus,jdbcType=VARCHAR},
+      </if>
+      <if test="note != null" >
+        note = #{note,jdbcType=VARCHAR},
+      </if>
+      <if test="patientappeal != null" >
+        patientappeal = #{patientappeal,jdbcType=VARCHAR},
+      </if>
+      <if test="medicalhistory != null" >
+        medicalhistory = #{medicalhistory,jdbcType=VARCHAR},
+      </if>
+      <if test="physicalstatus != null" >
+        physicalstatus = #{physicalstatus,jdbcType=VARCHAR},
+      </if>
+      <if test="primarydiagnosis != null" >
+        primarydiagnosis = #{primarydiagnosis,jdbcType=VARCHAR},
+      </if>
+      <if test="opinion != null" >
+        opinion = #{opinion,jdbcType=VARCHAR},
+      </if>
+      <if test="isvalid != null" >
+        isvalid = #{isvalid,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

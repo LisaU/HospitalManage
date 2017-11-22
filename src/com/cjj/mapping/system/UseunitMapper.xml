@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cjj.dao.system.UseunitMapper" >
+  <resultMap id="BaseResultMap" type="com.cjj.po.Useunit" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="unitname" property="unitname" jdbcType="VARCHAR" />
+    <result column="tel" property="tel" jdbcType="VARCHAR" />
+    <result column="postcode" property="postcode" jdbcType="INTEGER" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="fax" property="fax" jdbcType="VARCHAR" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="bankid" property="bankid" jdbcType="INTEGER" />
+    <result column="bankaccount" property="bankaccount" jdbcType="VARCHAR" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, unitname, tel, postcode, phone, fax, address, bankid, bankaccount, email
+  </sql>
+  
+  <select id="findOne" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Column_List" />
+    from useunit LIMIT 1
+  </select>
+  
+  <insert id="insert" parameterType="com.cjj.po.Useunit" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into useunit (unitname, tel, postcode, 
+      phone, fax, address, 
+      bankid, bankaccount, email
+      )
+    values (#{unitname,jdbcType=VARCHAR}, #{tel,jdbcType=VARCHAR}, #{postcode,jdbcType=INTEGER}, 
+      #{phone,jdbcType=VARCHAR}, #{fax,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, 
+      #{bankid,jdbcType=INTEGER}, #{bankaccount,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}
+      )
+  </insert>
+  
+  <update id="updateByPrimaryKeySelective" parameterType="com.cjj.po.Useunit" >
+    update useunit
+    <set >
+      <if test="unitname != null" >
+        unitname = #{unitname,jdbcType=VARCHAR},
+      </if>
+      <if test="tel != null" >
+        tel = #{tel,jdbcType=VARCHAR},
+      </if>
+      <if test="postcode != null" >
+        postcode = #{postcode,jdbcType=INTEGER},
+      </if>
+      <if test="phone != null" >
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="fax != null" >
+        fax = #{fax,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="bankid != null" >
+        bankid = #{bankid,jdbcType=INTEGER},
+      </if>
+      <if test="bankaccount != null" >
+        bankaccount = #{bankaccount,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

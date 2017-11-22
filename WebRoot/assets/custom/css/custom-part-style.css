@@ -1,0 +1,14 @@
+/*!
+* Copyright 2017-03-10
+* part styles
+*/
+.text-m{display:inline-block; width:67%;height:30px;}
+.controls-radio{width:60%;display:inline-block;min-width:164px;}
+input{width:60%;min-width:150px;}
+.text-m input{width:79%;min-width:126px;}
+.chzn-container,.chzn-container-single{width:63.6%!important; min-width:164px;}
+.text-m span + label{margin-left:-25px;}
+.input-append, .input-prepend{margin-bottom:0;}
+.textarea-c{width:88%!important; min-width:220px;height:120px;}
+input{width:60%;min-width:150px;}
+.range_inputs input{min-width:60px;}

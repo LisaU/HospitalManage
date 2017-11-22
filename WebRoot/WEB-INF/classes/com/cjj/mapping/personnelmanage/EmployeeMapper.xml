@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cjj.dao.personnelmanage.EmployeeMapper" >
+  <resultMap id="BaseResultMap" type="com.cjj.po.Employee" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="employeecode" property="employeecode" jdbcType="VARCHAR" />
+    <result column="employeename" property="employeename" jdbcType="VARCHAR" />
+    <result column="psw" property="psw" jdbcType="VARCHAR" />
+    <result column="pinyincode" property="pinyincode" jdbcType="VARCHAR" />
+    <result column="wubicode" property="wubicode" jdbcType="VARCHAR" />
+    <result column="jobtitleid" property="jobtitleid" jdbcType="INTEGER" />
+    <result column="positionid" property="positionid" jdbcType="INTEGER" />
+    <result column="sex" property="sex" jdbcType="INTEGER" />
+    <result column="tel" property="tel" jdbcType="VARCHAR" />
+    <result column="departmentid" property="departmentid" jdbcType="INTEGER" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="idcard" property="idcard" jdbcType="VARCHAR" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="birthday" property="birthday" jdbcType="DATE" />
+    <result column="inductiontime" property="inductiontime" jdbcType="TIMESTAMP" />
+    <result column="dimissiontime" property="dimissiontime" jdbcType="TIMESTAMP" />
+    <result column="maxeducationid" property="maxeducationid" jdbcType="INTEGER" />
+    <result column="majorid" property="majorid" jdbcType="INTEGER" />
+    <result column="politicsstatusid" property="politicsstatusid" jdbcType="INTEGER" />
+    <result column="isoperator" property="isoperator" jdbcType="INTEGER" />
+    <result column="isdoctor" property="isdoctor" jdbcType="INTEGER" />
+    <result column="isnurse" property="isnurse" jdbcType="INTEGER" />
+    <result column="workstatus" property="workstatus" jdbcType="INTEGER" />
+    <result column="picture" property="picture" jdbcType="VARCHAR" />
+    <result column="note" property="note" jdbcType="VARCHAR" />
+    <result column="isvalid" property="isvalid" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, employeecode, employeename, psw, pinyincode, wubicode, jobtitleid, positionid, 
+    sex, tel, departmentid, email, idcard, address, birthday, inductiontime, 
+    dimissiontime, maxeducationid, majorid, politicsstatusid, isoperator, isdoctor, isnurse, 
+    workstatus, picture, note, isvalid
+  </sql>
+  
+  <!-- 验证用户名是否存在 -->
+  <select id="findByEpCode" resultMap="BaseResultMap">
+  	SELECT * FROM employee WHERE employeecode = #{employeecode,jdbcType=VARCHAR}
+  </select>
+  <!-- 登录 -->
+  <select id="login" resultType="com.cjj.vo.EmployeeVo" parameterType="com.cjj.po.Employee">
+    SELECT e.*,a.detailname AS jobtitlename,a1.detailname AS positionname,a2.detailname AS maxeducationname,
+	a3.detailname AS majorname,a4.detailname AS politicsstatusname,d.departmentname FROM employee e 
+	LEFT JOIN department d ON d.id = e.departmentid LEFT JOIN attributedetail a ON a.id = e.jobtitleid  
+	LEFT JOIN attributedetail a1 ON a1.id = e.positionid LEFT JOIN attributedetail a2 ON a2.id = e.maxeducationid  
+	LEFT JOIN attributedetail a3 ON a3.id = e.majorid LEFT JOIN attributedetail a4 ON a4.id = e.politicsstatusid 
+	WHERE e.isvalid = 1 AND e.employeecode = #{employeecode,jdbcType=VARCHAR} 
+	AND e.psw = #{psw,jdbcType=VARCHAR}
+  </select>
+  
+  <!-- 分页查询 -->
+  <select id="vagueFind" resultType="com.cjj.vo.EmployeeVo">
+  	SELECT e.*,a.detailname AS jobtitlename,a1.detailname AS positionname,a2.detailname AS maxeducationname,
+	a3.detailname AS majorname,a4.detailname AS politicsstatusname,d.departmentname FROM employee e 
+	LEFT JOIN department d ON d.id = e.departmentid LEFT JOIN attributedetail a ON a.id = e.jobtitleid  
+	LEFT JOIN attributedetail a1 ON a1.id = e.positionid LEFT JOIN attributedetail a2 ON a2.id = e.maxeducationid  
+	LEFT JOIN attributedetail a3 ON a3.id = e.majorid LEFT JOIN attributedetail a4 ON a4.id = e.politicsstatusid 
+	WHERE e.isvalid = 1 AND (LOCATE(#{contant,jdbcType=VARCHAR},e.employeecode) 
+	OR LOCATE(#{contant,jdbcType=VARCHAR},e.employeename) OR LOCATE(#{contant,jdbcType=VARCHAR},e.idcard))
+	<if test="currentpage==0">
+		limit 0, #{pagesize,jdbcType=INTEGER}
+	</if>
+	<if test="currentpage&gt;0">
+		limit ${(currentpage-1)*pagesize},${pagesize}
+	</if>
+  </select>
+  
+  <select id="findIsRegister" resultType="com.cjj.vo.EmployeeVo">
+    SELECT e.*,a.detailname AS jobtitlename,a1.detailname AS positionname,a2.detailname AS maxeducationname,
+	a3.detailname AS majorname,a4.detailname AS politicsstatusname,d.departmentname FROM employee e 
+	LEFT JOIN department d ON d.id = e.departmentid LEFT JOIN attributedetail a ON a.id = e.jobtitleid  
+	LEFT JOIN attributedetail a1 ON a1.id = e.positionid LEFT JOIN attributedetail a2 ON a2.id = e.maxeducationid  
+	LEFT JOIN attributedetail a3 ON a3.id = e.majorid LEFT JOIN attributedetail a4 ON a4.id = e.politicsstatusid 
+	LEFT JOIN role r ON FIND_IN_SET(e.positionid,r.positionid) WHERE e.isvalid = 1 
+	AND d.isregister = 1 AND r.rolename = '门诊医生'
+  </select>
+  <select id="findRegisterP" resultType="com.cjj.po.Employee">
+  	SELECT e.* FROM employee e LEFT JOIN role r ON FIND_IN_SET(e.positionid,r.positionid) WHERE e.isvalid = 1 AND r.rolename = '挂号员'
+  </select>
+  <select id="findChargeP" resultType="com.cjj.po.Employee">
+  	SELECT e.* FROM employee e LEFT JOIN role r ON FIND_IN_SET(e.positionid,r.positionid) WHERE e.isvalid = 1 AND r.rolename = '收费员'
+  </select>
+  <select id="findUser" resultType="com.cjj.vo.EmployeeVo" parameterType="java.lang.Integer">
+  	SELECT e.*,a.detailname AS jobtitlename,a1.detailname AS positionname,a2.detailname AS maxeducationname,
+	a3.detailname AS majorname,a4.detailname AS politicsstatusname,d.departmentname FROM employee e 
+	LEFT JOIN department d ON d.id = e.departmentid LEFT JOIN attributedetail a ON a.id = e.jobtitleid  
+	LEFT JOIN attributedetail a1 ON a1.id = e.positionid LEFT JOIN attributedetail a2 ON a2.id = e.maxeducationid  
+	LEFT JOIN attributedetail a3 ON a3.id = e.majorid LEFT JOIN attributedetail a4 ON a4.id = e.politicsstatusid 
+	WHERE e.isvalid = 1 AND e.id = #{id,jdbcType=INTEGER}
+  </select>  
+  <select id="findPsw" resultType="com.cjj.vo.EmployeeVo" parameterType="com.cjj.po.Employee">
+  	SELECT * FROM employee WHERE isvalid = 1 AND id = #{id,jdbcType=INTEGER} AND psw = #{psw,jdbcType=VARCHAR}
+  </select>
+  <select id="findByDepartmentId" resultType="com.cjj.vo.EmployeeVo" parameterType="java.lang.Integer">
+    SELECT e.*,a.detailname AS jobtitlename,a1.detailname AS positionname,a2.detailname AS maxeducationname,
+	a3.detailname AS majorname,a4.detailname AS politicsstatusname,d.departmentname FROM employee e 
+	LEFT JOIN department d ON d.id = e.departmentid LEFT JOIN attributedetail a ON a.id = e.jobtitleid  
+	LEFT JOIN attributedetail a1 ON a1.id = e.positionid LEFT JOIN attributedetail a2 ON a2.id = e.maxeducationid  
+	LEFT JOIN attributedetail a3 ON a3.id = e.majorid LEFT JOIN attributedetail a4 ON a4.id = e.politicsstatusid 
+	WHERE e.isvalid = 1 AND LOCATE(CASE WHEN #{id,jdbcType=INTEGER} = 0 THEN '' ELSE #{id,jdbcType=INTEGER} END,departmentid)
+  </select>
+  <update id="delete">
+  	UPDATE employee SET isvalid = 2 WHERE id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from employee
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <insert id="insert" parameterType="com.cjj.po.Employee" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into employee (employeecode, employeename, psw, 
+      pinyincode, wubicode, jobtitleid, 
+      positionid, sex, tel, 
+      departmentid, email, 
+      idcard, address, birthday, 
+      inductiontime, dimissiontime, maxeducationid, 
+      majorid, politicsstatusid, isoperator, 
+      isdoctor, isnurse, workstatus, 
+      picture, note, isvalid
+      )
+    values (#{employeecode,jdbcType=VARCHAR}, #{employeename,jdbcType=VARCHAR}, #{psw,jdbcType=VARCHAR}, 
+      #{pinyincode,jdbcType=VARCHAR}, #{wubicode,jdbcType=VARCHAR}, #{jobtitleid,jdbcType=INTEGER}, 
+      #{positionid,jdbcType=INTEGER}, #{sex,jdbcType=INTEGER}, #{tel,jdbcType=VARCHAR}, 
+      #{departmentid,jdbcType=INTEGER}, #{email,jdbcType=VARCHAR}, 
+      #{idcard,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{birthday,jdbcType=DATE}, 
+      #{inductiontime,jdbcType=TIMESTAMP}, #{dimissiontime,jdbcType=TIMESTAMP}, #{maxeducationid,jdbcType=INTEGER}, 
+      #{majorid,jdbcType=INTEGER}, #{politicsstatusid,jdbcType=INTEGER}, #{isoperator,jdbcType=INTEGER}, 
+      #{isdoctor,jdbcType=INTEGER}, #{isnurse,jdbcType=INTEGER}, #{workstatus,jdbcType=INTEGER}, 
+      #{picture,jdbcType=VARCHAR}, #{note,jdbcType=VARCHAR}, #{isvalid,jdbcType=INTEGER}
+      )
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cjj.po.Employee" >
+    update employee
+    <set >
+      <if test="employeecode != null" >
+        employeecode = #{employeecode,jdbcType=VARCHAR},
+      </if>
+      <if test="employeename != null" >
+        employeename = #{employeename,jdbcType=VARCHAR},
+      </if>
+      <if test="psw != null" >
+        psw = #{psw,jdbcType=VARCHAR},
+      </if>
+      <if test="pinyincode != null" >
+        pinyincode = #{pinyincode,jdbcType=VARCHAR},
+      </if>
+      <if test="wubicode != null" >
+        wubicode = #{wubicode,jdbcType=VARCHAR},
+      </if>
+      <if test="jobtitleid != null" >
+        jobtitleid = #{jobtitleid,jdbcType=INTEGER},
+      </if>
+      <if test="positionid != null" >
+        positionid = #{positionid,jdbcType=INTEGER},
+      </if>
+      <if test="sex != null" >
+        sex = #{sex,jdbcType=INTEGER},
+      </if>
+      <if test="tel != null" >
+        tel = #{tel,jdbcType=VARCHAR},
+      </if>
+      <if test="departmentid != null" >
+        departmentid = #{departmentid,jdbcType=INTEGER},
+      </if>
+      <if test="email != null" >
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="idcard != null" >
+        idcard = #{idcard,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="birthday != null" >
+        birthday = #{birthday,jdbcType=DATE},
+      </if>
+      <if test="inductiontime != null" >
+        inductiontime = #{inductiontime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="dimissiontime != null" >
+        dimissiontime = #{dimissiontime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="maxeducationid != null" >
+        maxeducationid = #{maxeducationid,jdbcType=INTEGER},
+      </if>
+      <if test="majorid != null" >
+        majorid = #{majorid,jdbcType=INTEGER},
+      </if>
+      <if test="politicsstatusid != null" >
+        politicsstatusid = #{politicsstatusid,jdbcType=INTEGER},
+      </if>
+      <if test="isoperator != null" >
+        isoperator = #{isoperator,jdbcType=INTEGER},
+      </if>
+      <if test="isdoctor != null" >
+        isdoctor = #{isdoctor,jdbcType=INTEGER},
+      </if>
+      <if test="isnurse != null" >
+        isnurse = #{isnurse,jdbcType=INTEGER},
+      </if>
+      <if test="workstatus != null" >
+        workstatus = #{workstatus,jdbcType=INTEGER},
+      </if>
+      <if test="picture != null" >
+        picture = #{picture,jdbcType=VARCHAR},
+      </if>
+      <if test="note != null" >
+        note = #{note,jdbcType=VARCHAR},
+      </if>
+      <if test="isvalid != null" >
+        isvalid = #{isvalid,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

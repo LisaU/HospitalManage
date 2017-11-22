@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cjj.dao.doctorworkstation.PrescriptiontemplatedetailMapper" >
+  <resultMap id="BaseResultMap" type="com.cjj.po.Prescriptiontemplatedetail" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="prescriptiontemplateid" property="prescriptiontemplateid" jdbcType="INTEGER" />
+    <result column="drugid" property="drugid" jdbcType="INTEGER" />
+    <result column="eachdosage" property="eachdosage" jdbcType="INTEGER" />
+    <result column="dosagequantity" property="dosagequantity" jdbcType="INTEGER" />
+    <result column="medicineformid" property="medicineformid" jdbcType="INTEGER" />
+    <result column="medicinefrequencyid" property="medicinefrequencyid" jdbcType="INTEGER" />
+    <result column="medicineamount" property="medicineamount" jdbcType="INTEGER" />
+    <result column="note" property="note" jdbcType="VARCHAR" />
+    <result column="isvalid" property="isvalid" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, prescriptiontemplateid, drugid, eachdosage, dosagequantity, medicineformid, medicinefrequencyid, 
+    medicineamount, note, isvalid
+  </sql>
+  
+  <select id="findByTemplateid" resultType="com.cjj.vo.PrescriptiontemplatedetailVo">
+  	SELECT p.*,d.drugcode,d.drugname,a1.detailname AS medicineformname, a2.detailenname AS medicinefrequencyname 
+	FROM prescriptiontemplatedetail p LEFT JOIN drug d ON d.id = p.drugid LEFT JOIN attributedetail a1 
+	ON a1.id = p.medicineformid LEFT JOIN attributedetail a2 ON a2.id = p.medicinefrequencyid WHERE p.isvalid = 1 
+	AND prescriptiontemplateid = #{id,jdbcType=INTEGER}
+  </select>
+  <update id="deleteByPrescriptionid" parameterType="java.lang.Integer">
+  	UPDATE prescriptiontemplatedetail SET isvalid = 2 WHERE prescriptiontemplateid = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from prescriptiontemplatedetail
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <insert id="insert" parameterType="com.cjj.po.Prescriptiontemplatedetail" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into prescriptiontemplatedetail (prescriptiontemplateid, drugid, eachdosage, 
+      dosagequantity, medicineformid, medicinefrequencyid, 
+      medicineamount, note, isvalid
+      )
+    values (#{prescriptiontemplateid,jdbcType=INTEGER}, #{drugid,jdbcType=INTEGER}, #{eachdosage,jdbcType=INTEGER}, 
+      #{dosagequantity,jdbcType=INTEGER}, #{medicineformid,jdbcType=INTEGER}, #{medicinefrequencyid,jdbcType=INTEGER}, 
+      #{medicineamount,jdbcType=INTEGER}, #{note,jdbcType=VARCHAR}, #{isvalid,jdbcType=INTEGER}
+      )
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cjj.po.Prescriptiontemplatedetail" >
+    update prescriptiontemplatedetail
+    <set >
+      <if test="prescriptiontemplateid != null" >
+        prescriptiontemplateid = #{prescriptiontemplateid,jdbcType=INTEGER},
+      </if>
+      <if test="drugid != null" >
+        drugid = #{drugid,jdbcType=INTEGER},
+      </if>
+      <if test="eachdosage != null" >
+        eachdosage = #{eachdosage,jdbcType=INTEGER},
+      </if>
+      <if test="dosagequantity != null" >
+        dosagequantity = #{dosagequantity,jdbcType=INTEGER},
+      </if>
+      <if test="medicineformid != null" >
+        medicineformid = #{medicineformid,jdbcType=INTEGER},
+      </if>
+      <if test="medicinefrequencyid != null" >
+        medicinefrequencyid = #{medicinefrequencyid,jdbcType=INTEGER},
+      </if>
+      <if test="medicineamount != null" >
+        medicineamount = #{medicineamount,jdbcType=INTEGER},
+      </if>
+      <if test="note != null" >
+        note = #{note,jdbcType=VARCHAR},
+      </if>
+      <if test="isvalid != null" >
+        isvalid = #{isvalid,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

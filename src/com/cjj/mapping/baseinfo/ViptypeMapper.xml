@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cjj.dao.baseinfo.ViptypeMapper" >
+  <resultMap id="BaseResultMap" type="com.cjj.po.Viptype" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="typecode" property="typecode" jdbcType="VARCHAR" />
+    <result column="typename" property="typename" jdbcType="VARCHAR" />
+    <result column="typediscount" property="typediscount" jdbcType="INTEGER" />
+    <result column="note" property="note" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, typecode, typename, typediscount, note
+  </sql>
+  
+  <select id="findAll" resultMap="BaseResultMap" >
+  	SELECT * FROM viptype
+  </select>
+</mapper>

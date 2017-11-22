@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cjj.dao.dispensingmanage.DrugMapper" >
+  <resultMap id="BaseResultMap" type="com.cjj.po.Drug" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="chargetypeid" property="chargetypeid" jdbcType="INTEGER" />
+    <result column="drugname" property="drugname" jdbcType="VARCHAR" />
+    <result column="drugcode" property="drugcode" jdbcType="VARCHAR" />
+    <result column="barcode" property="barcode" jdbcType="VARCHAR" />
+    <result column="medicalsciencecode" property="medicalsciencecode" jdbcType="VARCHAR" />
+    <result column="enname" property="enname" jdbcType="VARCHAR" />
+    <result column="origin" property="origin" jdbcType="VARCHAR" />
+    <result column="approvalnumber" property="approvalnumber" jdbcType="VARCHAR" />
+    <result column="pinyincode" property="pinyincode" jdbcType="VARCHAR" />
+    <result column="wubicode" property="wubicode" jdbcType="VARCHAR" />
+    <result column="drugtypeid" property="drugtypeid" jdbcType="INTEGER" />
+    <result column="agenttypeid" property="agenttypeid" jdbcType="INTEGER" />
+    <result column="dosageunit" property="dosageunit" jdbcType="VARCHAR" />
+    <result column="unitdosage" property="unitdosage" jdbcType="VARCHAR" />
+    <result column="norms" property="norms" jdbcType="VARCHAR" />
+    <result column="inbulkbuyprice" property="inbulkbuyprice" jdbcType="DECIMAL" />
+    <result column="inbulkvipprice" property="inbulkvipprice" jdbcType="DECIMAL" />
+    <result column="inbulksellprice" property="inbulksellprice" jdbcType="DECIMAL" />
+    <result column="packagebuyprice" property="packagebuyprice" jdbcType="DECIMAL" />
+    <result column="packagesellprice" property="packagesellprice" jdbcType="DECIMAL" />
+    <result column="packagevipprice" property="packagevipprice" jdbcType="DECIMAL" />
+    <result column="ismedicare" property="ismedicare" jdbcType="INTEGER" />
+    <result column="medicaretypeid" property="medicaretypeid" jdbcType="INTEGER" />
+    <result column="medicarecode" property="medicarecode" jdbcType="INTEGER" />
+    <result column="medicareprice" property="medicareprice" jdbcType="VARCHAR" />
+    <result column="isaddwater" property="isaddwater" jdbcType="INTEGER" />
+    <result column="isST" property="isst" jdbcType="INTEGER" />
+    <result column="isspecialdrug" property="isspecialdrug" jdbcType="INTEGER" />
+    <result column="shelfcode" property="shelfcode" jdbcType="VARCHAR" />
+    <result column="productiondata" property="productiondata" jdbcType="DATE" />
+    <result column="expiration" property="expiration" jdbcType="INTEGER" />
+    <result column="supplierid" property="supplierid" jdbcType="INTEGER" />
+    <result column="usestatus" property="usestatus" jdbcType="INTEGER" />
+    <result column="manufacturer" property="manufacturer" jdbcType="VARCHAR" />
+    <result column="applysymptom" property="applysymptom" jdbcType="VARCHAR" />
+    <result column="mainefficacy" property="mainefficacy" jdbcType="VARCHAR" />
+    <result column="inventoryquantity" property="inventoryquantity" jdbcType="INTEGER" />
+    <result column="inventoryprice" property="inventoryprice" jdbcType="DECIMAL" />
+    <result column="typeinpersonnelid" property="typeinpersonnelid" jdbcType="INTEGER" />
+    <result column="typeindatetime" property="typeindatetime" jdbcType="TIMESTAMP" />
+    <result column="alterpersonnelid" property="alterpersonnelid" jdbcType="INTEGER" />
+    <result column="alterdatetime" property="alterdatetime" jdbcType="TIMESTAMP" />
+    <result column="picture" property="picture" jdbcType="VARCHAR" />
+    <result column="isvalid" property="isvalid" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, chargetypeid, drugname, drugcode, barcode, medicalsciencecode, enname, origin, 
+    approvalnumber, pinyincode, wubicode, drugtypeid, agenttypeid, dosageunit, unitdosage, 
+    norms, inbulkbuyprice, inbulkvipprice, inbulksellprice, packagebuyprice, packagesellprice, 
+    packagevipprice, ismedicare, medicaretypeid, medicarecode, medicareprice, isaddwater, 
+    isST, isspecialdrug, shelfcode, productiondata, expiration, supplierid, usestatus, 
+    manufacturer, applysymptom, mainefficacy, inventoryquantity, inventoryprice, typeinpersonnelid, 
+    typeindatetime, alterpersonnelid, alterdatetime, picture, isvalid
+  </sql>
+   
+  <select id="manyConditionsFind" resultType="com.cjj.vo.DrugVo">
+  	SELECT d.*,c.typename AS chargetypename,a1.detailname AS drugtypename,a2.detailname AS agenttypename,
+	a3.detailname AS medicaretypename,s.suppliername FROM drug d LEFT JOIN chargetype c ON c.id = d.chargetypeid 
+	LEFT JOIN attributedetail a1 ON a1.id = d.drugtypeid LEFT JOIN attributedetail a2 ON a2.id = d.agenttypeid 
+	LEFT JOIN attributedetail a3 ON a3.id = d.medicaretypeid LEFT JOIN supplier s ON s.id = d.supplierid 
+	WHERE d.isvalid = 1 AND LOCATE(#{vo.drugname,jdbcType=VARCHAR},d.drugname) AND 
+	LOCATE(#{vo.drugcode,jdbcType=VARCHAR},d.drugcode) AND LOCATE(#{vo.medicalsciencecode,jdbcType=VARCHAR},d.medicalsciencecode) 
+	AND LOCATE(#{vo.pinyincode,jdbcType=VARCHAR},d.pinyincode) AND LOCATE(#{vo.manufacturer,jdbcType=VARCHAR},d.manufacturer) 
+	AND LOCATE(CASE WHEN #{vo.supplierid,jdbcType=INTEGER} = 0 THEN '' ELSE #{vo.supplierid,jdbcType=INTEGER} END,d.supplierid) 
+	AND LOCATE(CASE WHEN #{vo.usestatus,jdbcType=INTEGER} = 0 THEN '' ELSE #{vo.usestatus,jdbcType=INTEGER} END,d.usestatus) 
+	AND LOCATE(CASE WHEN #{vo.chargetypeid,jdbcType=INTEGER} = 0 THEN '' ELSE #{vo.chargetypeid,jdbcType=INTEGER} END,d.chargetypeid)
+	<if test="currentpage==0">
+		limit 0, #{pagesize,jdbcType=INTEGER}
+	</if>
+	<if test="currentpage&gt;0">
+		limit ${(currentpage-1)*pagesize},${pagesize}
+	</if>
+  </select>
+  <select id="vagueFind" resultType="com.cjj.vo.DrugVo">
+  	SELECT d.*,c.typename AS chargetypename,a1.detailname AS drugtypename,a2.detailname AS agenttypename,
+	a3.detailname AS medicaretypename,s.suppliername, 
+	(CASE WHEN (d.inventoryquantity - (SELECT SUM(pd.medicineamount) AS medicineamout FROM prescriptiondetail pd 
+	LEFT JOIN prescription p ON p.id = pd.prescriptionid LEFT JOIN register r ON r.id = p.registerid WHERE p.isvalid = 1 
+	AND (r.registerstatus = 3 OR r.registerstatus = 4) AND pd.drugid = d.id)) IS NULL THEN d.inventoryquantity ELSE 
+	(d.inventoryquantity - (SELECT SUM(pd.medicineamount) AS medicineamout FROM prescriptiondetail pd LEFT JOIN 
+	prescription p ON p.id = pd.prescriptionid LEFT JOIN register r ON r.id = p.registerid WHERE p.isvalid = 1 AND 
+	(r.registerstatus = 3 OR r.registerstatus = 4) AND pd.drugid = d.id)) END) AS virtualinventory 
+	FROM drug d LEFT JOIN chargetype c ON c.id = d.chargetypeid 
+	LEFT JOIN attributedetail a1 ON a1.id = d.drugtypeid LEFT JOIN attributedetail a2 ON a2.id = d.agenttypeid 
+	LEFT JOIN attributedetail a3 ON a3.id = d.medicaretypeid LEFT JOIN supplier s ON s.id = d.supplierid 
+	WHERE d.isvalid = 1 AND (LOCATE(#{contant,jdbcType=VARCHAR},d.drugname) OR LOCATE(#{contant,jdbcType=VARCHAR},d.pinyincode) OR
+	LOCATE(#{contant,jdbcType=VARCHAR},d.drugcode))
+  </select> 
+  <select id="findByid" resultType="com.cjj.vo.DrugVo">
+  	SELECT d.*,e.employeename FROM drug d LEFT JOIN employee e ON e.id = d.typeinpersonnelid
+	WHERE d.isvalid = 1 AND d.id = #{id,jdbcType=INTEGER}
+  </select>
+  <update id="updateInventoryquantity" parameterType="com.cjj.po.Drug">
+  	UPDATE drug SET inventoryquantity = #{inventoryquantity,jdbcType=INTEGER} WHERE id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="delete" parameterType="java.lang.Integer">
+  	UPDATE drug SET isvalid = 2 WHERE id = #{id,jdbcType=INTEGER}
+  </update>
+  <insert id="insert" parameterType="com.cjj.po.Drug" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into drug (chargetypeid, drugname, drugcode, 
+      barcode, medicalsciencecode, enname, 
+      origin, approvalnumber, pinyincode, 
+      wubicode, drugtypeid, agenttypeid, 
+      dosageunit, unitdosage, norms, 
+      inbulkbuyprice, inbulkvipprice, inbulksellprice, 
+      packagebuyprice, packagesellprice, packagevipprice, 
+      ismedicare, medicaretypeid, medicarecode, 
+      medicareprice, isaddwater, isST, 
+      isspecialdrug, shelfcode, productiondata, 
+      expiration, supplierid, usestatus, 
+      manufacturer, applysymptom, mainefficacy, 
+      inventoryquantity, inventoryprice, typeinpersonnelid, 
+      typeindatetime, alterpersonnelid, alterdatetime, 
+      picture, isvalid)
+    values (#{chargetypeid,jdbcType=INTEGER}, #{drugname,jdbcType=VARCHAR}, #{drugcode,jdbcType=VARCHAR}, 
+      #{barcode,jdbcType=VARCHAR}, #{medicalsciencecode,jdbcType=VARCHAR}, #{enname,jdbcType=VARCHAR}, 
+      #{origin,jdbcType=VARCHAR}, #{approvalnumber,jdbcType=VARCHAR}, #{pinyincode,jdbcType=VARCHAR}, 
+      #{wubicode,jdbcType=VARCHAR}, #{drugtypeid,jdbcType=INTEGER}, #{agenttypeid,jdbcType=INTEGER}, 
+      #{dosageunit,jdbcType=VARCHAR}, #{unitdosage,jdbcType=VARCHAR}, #{norms,jdbcType=VARCHAR}, 
+      #{inbulkbuyprice,jdbcType=DECIMAL}, #{inbulkvipprice,jdbcType=DECIMAL}, #{inbulksellprice,jdbcType=DECIMAL}, 
+      #{packagebuyprice,jdbcType=DECIMAL}, #{packagesellprice,jdbcType=DECIMAL}, #{packagevipprice,jdbcType=DECIMAL}, 
+      #{ismedicare,jdbcType=INTEGER}, #{medicaretypeid,jdbcType=INTEGER}, #{medicarecode,jdbcType=INTEGER}, 
+      #{medicareprice,jdbcType=VARCHAR}, #{isaddwater,jdbcType=INTEGER}, #{isst,jdbcType=INTEGER}, 
+      #{isspecialdrug,jdbcType=INTEGER}, #{shelfcode,jdbcType=VARCHAR}, #{productiondata,jdbcType=DATE}, 
+      #{expiration,jdbcType=INTEGER}, #{supplierid,jdbcType=INTEGER}, #{usestatus,jdbcType=INTEGER}, 
+      #{manufacturer,jdbcType=VARCHAR}, #{applysymptom,jdbcType=VARCHAR}, #{mainefficacy,jdbcType=VARCHAR}, 
+      #{inventoryquantity,jdbcType=INTEGER}, #{inventoryprice,jdbcType=DECIMAL}, #{typeinpersonnelid,jdbcType=INTEGER}, 
+      #{typeindatetime,jdbcType=TIMESTAMP}, #{alterpersonnelid,jdbcType=INTEGER}, #{alterdatetime,jdbcType=TIMESTAMP}, 
+      #{picture,jdbcType=VARCHAR}, #{isvalid,jdbcType=INTEGER})
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cjj.po.Drug" >
+    update drug
+    <set >
+      <if test="chargetypeid != null" >
+        chargetypeid = #{chargetypeid,jdbcType=INTEGER},
+      </if>
+      <if test="drugname != null" >
+        drugname = #{drugname,jdbcType=VARCHAR},
+      </if>
+      <if test="drugcode != null" >
+        drugcode = #{drugcode,jdbcType=VARCHAR},
+      </if>
+      <if test="barcode != null" >
+        barcode = #{barcode,jdbcType=VARCHAR},
+      </if>
+      <if test="medicalsciencecode != null" >
+        medicalsciencecode = #{medicalsciencecode,jdbcType=VARCHAR},
+      </if>
+      <if test="enname != null" >
+        enname = #{enname,jdbcType=VARCHAR},
+      </if>
+      <if test="origin != null" >
+        origin = #{origin,jdbcType=VARCHAR},
+      </if>
+      <if test="approvalnumber != null" >
+        approvalnumber = #{approvalnumber,jdbcType=VARCHAR},
+      </if>
+      <if test="pinyincode != null" >
+        pinyincode = #{pinyincode,jdbcType=VARCHAR},
+      </if>
+      <if test="wubicode != null" >
+        wubicode = #{wubicode,jdbcType=VARCHAR},
+      </if>
+      <if test="drugtypeid != null" >
+        drugtypeid = #{drugtypeid,jdbcType=INTEGER},
+      </if>
+      <if test="agenttypeid != null" >
+        agenttypeid = #{agenttypeid,jdbcType=INTEGER},
+      </if>
+      <if test="dosageunit != null" >
+        dosageunit = #{dosageunit,jdbcType=VARCHAR},
+      </if>
+      <if test="unitdosage != null" >
+        unitdosage = #{unitdosage,jdbcType=VARCHAR},
+      </if>
+      <if test="norms != null" >
+        norms = #{norms,jdbcType=VARCHAR},
+      </if>
+      <if test="inbulkbuyprice != null" >
+        inbulkbuyprice = #{inbulkbuyprice,jdbcType=DECIMAL},
+      </if>
+      <if test="inbulkvipprice != null" >
+        inbulkvipprice = #{inbulkvipprice,jdbcType=DECIMAL},
+      </if>
+      <if test="inbulksellprice != null" >
+        inbulksellprice = #{inbulksellprice,jdbcType=DECIMAL},
+      </if>
+      <if test="packagebuyprice != null" >
+        packagebuyprice = #{packagebuyprice,jdbcType=DECIMAL},
+      </if>
+      <if test="packagesellprice != null" >
+        packagesellprice = #{packagesellprice,jdbcType=DECIMAL},
+      </if>
+      <if test="packagevipprice != null" >
+        packagevipprice = #{packagevipprice,jdbcType=DECIMAL},
+      </if>
+      <if test="ismedicare != null" >
+        ismedicare = #{ismedicare,jdbcType=INTEGER},
+      </if>
+      <if test="medicaretypeid != null" >
+        medicaretypeid = #{medicaretypeid,jdbcType=INTEGER},
+      </if>
+      <if test="medicarecode != null" >
+        medicarecode = #{medicarecode,jdbcType=INTEGER},
+      </if>
+      <if test="medicareprice != null" >
+        medicareprice = #{medicareprice,jdbcType=VARCHAR},
+      </if>
+      <if test="isaddwater != null" >
+        isaddwater = #{isaddwater,jdbcType=INTEGER},
+      </if>
+      <if test="isst != null" >
+        isST = #{isst,jdbcType=INTEGER},
+      </if>
+      <if test="isspecialdrug != null" >
+        isspecialdrug = #{isspecialdrug,jdbcType=INTEGER},
+      </if>
+      <if test="shelfcode != null" >
+        shelfcode = #{shelfcode,jdbcType=VARCHAR},
+      </if>
+      <if test="productiondata != null" >
+        productiondata = #{productiondata,jdbcType=DATE},
+      </if>
+      <if test="expiration != null" >
+        expiration = #{expiration,jdbcType=INTEGER},
+      </if>
+      <if test="supplierid != null" >
+        supplierid = #{supplierid,jdbcType=INTEGER},
+      </if>
+      <if test="usestatus != null" >
+        usestatus = #{usestatus,jdbcType=INTEGER},
+      </if>
+      <if test="manufacturer != null" >
+        manufacturer = #{manufacturer,jdbcType=VARCHAR},
+      </if>
+      <if test="applysymptom != null" >
+        applysymptom = #{applysymptom,jdbcType=VARCHAR},
+      </if>
+      <if test="mainefficacy != null" >
+        mainefficacy = #{mainefficacy,jdbcType=VARCHAR},
+      </if>
+      <if test="inventoryquantity != null" >
+        inventoryquantity = #{inventoryquantity,jdbcType=INTEGER},
+      </if>
+      <if test="inventoryprice != null" >
+        inventoryprice = #{inventoryprice,jdbcType=DECIMAL},
+      </if>
+      <if test="typeinpersonnelid != null" >
+        typeinpersonnelid = #{typeinpersonnelid,jdbcType=INTEGER},
+      </if>
+      <if test="typeindatetime != null" >
+        typeindatetime = #{typeindatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="alterpersonnelid != null" >
+        alterpersonnelid = #{alterpersonnelid,jdbcType=INTEGER},
+      </if>
+      <if test="alterdatetime != null" >
+        alterdatetime = #{alterdatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="picture != null" >
+        picture = #{picture,jdbcType=VARCHAR},
+      </if>
+      <if test="isvalid != null" >
+        isvalid = #{isvalid,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cjj.dao.doctorworkstation.DiseaseMapper" >
+  <resultMap id="BaseResultMap" type="com.cjj.po.Disease" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="diseasecode" property="diseasecode" jdbcType="VARCHAR" />
+    <result column="diseasename" property="diseasename" jdbcType="VARCHAR" />
+    <result column="diseaseexplain" property="diseaseexplain" jdbcType="VARCHAR" />
+    <result column="isvalid" property="isvalid" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, diseasecode, diseasename, diseaseexplain, isvalid
+  </sql>
+  
+  <select id="findAll" resultMap="BaseResultMap">
+  	SELECT * FROM disease WHERE isvalid = 1
+  </select>
+</mapper>

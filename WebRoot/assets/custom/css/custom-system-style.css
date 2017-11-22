@@ -1,0 +1,17 @@
+/*!
+* Copyright 2017-03-10
+* jsp/system styles
+*/
+.span3,.span9{height:100%; border:1px dotted #e2e2e2;}
+.row-fluid .span3{width:23.076923076923077%;}
+.control-group-m{height:calc(100% - 40px); overflow: auto;}
+.row-fluid{height:calc(100% - 52px);}
+.titlediv,.btndiv{border-bottom:1px dotted #e2e2e2;}
+.titlediv{padding:10px 0;}
+.btndiv{padding:4px 0;}
+#textdiv{width:100%;}
+.titlediv span,.btndiv span{margin-left:15px;}
+.btn{width:auto; margin-left:50px;}
+#btndiv .btn{margin-left:5px;}
+table{width:100%;}
+input{width:98.6%; font-size:18px !important; padding:7px 5px !important;}

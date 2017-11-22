@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cjj.dao.dispensingmanage.DispensingMapper" >
+  <resultMap id="BaseResultMap" type="com.cjj.po.Dispensing" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="chargeid" property="chargeid" jdbcType="INTEGER" />
+    <result column="dispensingstatus" property="dispensingstatus" jdbcType="INTEGER" />
+    <result column="dispensingtime" property="dispensingtime" jdbcType="TIMESTAMP" />
+    <result column="isvalid" property="isvalid" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, chargeid, dispensingstatus, dispensingtime, isvalid
+  </sql>
+  
+  <select id="manyConditionsFind" resultType="com.cjj.vo.DispensingVo">
+  	SELECT d.*,c.chargestatus,p.id AS prescriptionid,p.registerid,p.prescriptioncode,pt.patientname,e.employeename FROM dispensing d LEFT JOIN 
+  	charge c ON c.id = d.chargeid LEFT JOIN prescription p ON p.id = c.prescriptionid LEFT JOIN register r ON r.id = p.registerid LEFT JOIN 
+	patient pt ON pt.id = r.patientid LEFT JOIN employee e ON e.id = p.doctorid LEFT JOIN department dt ON dt.id = e.departmentid
+	WHERE d.isvalid = 1 AND LOCATE(#{vo.prescriptioncode,jdbcType=VARCHAR},p.prescriptioncode) AND
+	LOCATE(#{vo.cardcode,jdbcType=VARCHAR},pt.cardcode) AND LOCATE(#{vo.patientname,jdbcType=VARCHAR},pt.patientname) AND 
+	LOCATE(CASE WHEN #{vo.departmentid,jdbcType=INTEGER} = 0 THEN '' ELSE #{vo.departmentid,jdbcType=INTEGER} END,e.departmentid) AND 
+	LOCATE(CASE WHEN #{vo.doctorid,jdbcType=INTEGER} = 0 THEN '' ELSE #{vo.doctorid,jdbcType=INTEGER} END,p.doctorid)
+	AND LOCATE(CASE WHEN #{vo.dispensingstatus,jdbcType=INTEGER} = 0 THEN '' ELSE #{vo.dispensingstatus,jdbcType=INTEGER} END,
+	CASE WHEN d.dispensingstatus IS NULL THEN 1 ELSE d.dispensingstatus END) AND CASE WHEN #{vo.begintime,jdbcType=VARCHAR} = '' 
+	THEN 1=1 ELSE CASE WHEN d.dispensingtime IS NULL THEN c.chargetime ELSE d.dispensingtime END BETWEEN #{vo.begintime,jdbcType=VARCHAR} 
+	AND #{vo.endtime,jdbcType=VARCHAR} END ORDER BY dispensingstatus,id ASC
+	<if test="currentpage==0">
+		limit 0, #{pagesize,jdbcType=INTEGER}
+	</if>
+	<if test="currentpage&gt;0">
+		limit ${(currentpage-1)*pagesize},${pagesize}
+	</if>
+  </select>
+  <select id="findByRegisterId" resultType="com.cjj.po.Dispensing">
+  	SELECT d.* FROM dispensing d LEFT JOIN charge c ON c.id = d.chargeid LEFT JOIN prescription p ON p.id = c.prescriptionid
+	LEFT JOIN register r ON r.id = p.registerid WHERE r.id = #{rid,jdbcType=INTEGER}
+  </select>
+  <update id="updatedispensingstatus" parameterType="com.cjj.po.Dispensing" >
+    update dispensing set dispensingstatus = #{dispensingstatus,jdbcType=INTEGER},
+    dispensingtime = #{dispensingtime,jdbcType=TIMESTAMP} 
+    where chargeid = #{chargeid,jdbcType=INTEGER}
+  </update>
+  <update id="delete" parameterType="java.lang.Integer" >
+  	UPDATE dispensing SET isvalid = 2 WHERE id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from dispensing
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <insert id="insert" parameterType="com.cjj.po.Dispensing" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into dispensing (chargeid, dispensingstatus, dispensingtime, 
+      isvalid)
+    values (#{chargeid,jdbcType=INTEGER}, #{dispensingstatus,jdbcType=INTEGER}, #{dispensingtime,jdbcType=TIMESTAMP}, 
+      #{isvalid,jdbcType=INTEGER})
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cjj.po.Dispensing" >
+    update dispensing
+    <set >
+      <if test="chargeid != null" >
+        chargeid = #{chargeid,jdbcType=INTEGER},
+      </if>
+      <if test="dispensingstatus != null" >
+        dispensingstatus = #{dispensingstatus,jdbcType=INTEGER},
+      </if>
+      <if test="dispensingtime != null" >
+        dispensingtime = #{dispensingtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isvalid != null" >
+        isvalid = #{isvalid,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

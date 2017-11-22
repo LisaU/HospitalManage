@@ -1,0 +1,29 @@
+.gritter-item-wrapper{background-image:none!important;box-shadow:0 2px 10px rgba(50,50,50,0.5);background:rgba(50,50,50,0.92)}
+.gritter-item-wrapper.gritter-info{background:rgba(49,81,133,0.92)}
+.gritter-item-wrapper.gritter-error{background:rgba(153,40,18,0.92)}
+.gritter-item-wrapper.gritter-success{background:rgba(89,131,75,0.92)}
+.gritter-item-wrapper.gritter-warning{background:rgba(190,112,31,0.92)}
+.gritter-item-wrapper.gritter-light{background:rgba(245,245,245,0.95);border:1px solid #BBB}
+.gritter-item-wrapper.gritter-light.gritter-info{background:rgba(232,242,255,0.95)}
+.gritter-item-wrapper.gritter-light.gritter-info .gritter-item{color:#4a577d}
+.gritter-item-wrapper.gritter-light.gritter-error{background:rgba(255,235,235,0.95)}
+.gritter-item-wrapper.gritter-light.gritter-error .gritter-item{color:#894a38}
+.gritter-item-wrapper.gritter-light.gritter-success{background:rgba(239,250,227,0.95)}
+.gritter-item-wrapper.gritter-light.gritter-success .gritter-item{color:#416131}
+.gritter-item-wrapper.gritter-light.gritter-warning{background:rgba(252,248,227,0.95)}
+.gritter-item-wrapper.gritter-light.gritter-warning .gritter-item{color:#946446}
+.gritter-top,.gritter-bottom,.gritter-item{background-image:none}
+.gritter-close{left:auto;right:3px;background-image:none;width:18px;height:18px;line-height:17px;text-align:center;border:2px solid transparent;border-radius:16px;color:#e17b67}
+.gritter-close:before{font-family:FontAwesome;font-size:16px;content:"\f00d"}
+.gritter-info .gritter-close{color:#ffa500}
+.gritter-error .gritter-close,.gritter-success .gritter-close,.gritter-warning .gritter-close{color:#ffea07}
+.gritter-close:hover{color:#FFF!important}
+.gritter-title{text-shadow:none}
+.gritter-light .gritter-item,.gritter-light .gritter-bottom,.gritter-light .gritter-top,.gritter-light .gritter-close{background-image:none;color:#444}
+.gritter-light .gritter-title{text-shadow:none}.gritter-light .gritter-close:hover{color:#8a3104!important}
+.gritter-center{position:fixed;left:33%;right:33%;top:33%}.ui-slider{background-color:#CCC}
+.rtl #gritter-notice-wrapper{text-align:right;direction:rtl;left:20px;right:auto;}
+.rtl .gritter-close{right:auto;left:3px}
+.rtl .gritter-image{float:right}
+.rtl .gritter-with-image,
+.rtl .gritter-without-image{float:left}

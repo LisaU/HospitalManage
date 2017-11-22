@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cjj.dao.baseinfo.SupplierMapper" >
+  <resultMap id="BaseResultMap" type="com.cjj.po.Supplier" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="suppliercode" property="suppliercode" jdbcType="VARCHAR" />
+    <result column="suppliername" property="suppliername" jdbcType="VARCHAR" />
+    <result column="pinyincode" property="pinyincode" jdbcType="VARCHAR" />
+    <result column="wubicode" property="wubicode" jdbcType="VARCHAR" />
+    <result column="isuse" property="isuse" jdbcType="INTEGER" />
+    <result column="postcode" property="postcode" jdbcType="INTEGER" />
+    <result column="supplieraddress" property="supplieraddress" jdbcType="VARCHAR" />
+    <result column="contacts" property="contacts" jdbcType="VARCHAR" />
+    <result column="tel" property="tel" jdbcType="VARCHAR" />
+    <result column="fax" property="fax" jdbcType="VARCHAR" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="bankid" property="bankid" jdbcType="INTEGER" />
+    <result column="bankaccount" property="bankaccount" jdbcType="VARCHAR" />
+    <result column="clearingformid" property="clearingformid" jdbcType="INTEGER" />
+    <result column="regionid" property="regionid" jdbcType="INTEGER" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+    <result column="rankid" property="rankid" jdbcType="INTEGER" />
+    <result column="clearingday" property="clearingday" jdbcType="INTEGER" />
+    <result column="note" property="note" jdbcType="VARCHAR" />
+    <result column="isvalid" property="isvalid" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, suppliercode, suppliername, pinyincode, wubicode, isuse, postcode, supplieraddress, 
+    contacts, tel, fax, email, bankid, bankaccount, clearingformid, regionid, url, rankid, 
+    clearingday, note, isvalid
+  </sql>
+  
+  <select id="findAll" resultType="com.cjj.po.Supplier">
+  	SELECT * FROM supplier WHERE isvalid = 1
+  </select>
+</mapper>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<script type="text/javascript" src="js/laydate-v1.1/laydate/laydate.js"></script>
+		<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+		<meta charset="utf-8" />
+		<title>BINGO</title>
+		<style type="text/css">
+			body,
+			html {
+				background: white;
+				padding: 0px;
+				margin: 0px;
+				font-size: 45px;
+				color: red;
+				text-align: center;
+			}
+			
+			th,
+			td {
+				width: 100px;
+			}
+		</style>
+		<script type="text/javascript">
+			window.onload = function() {
+				for (var i = 0; i < 24; i++) {
+					document.getElementById("square" + i).innerHTML = Math.floor(Math.random() * 75) + 1;
+				}
+				document.onmousedown = function(e) { //点击获取表格中的值
+					alert(e.target.innerHTML)
+				}
+			}
+		</script>
+	</head>
+
+	<body>
+
+		<input id="hello" class="laydate-icon">
+		<script>
+			laydate.skin('molv');
+			laydate({
+				// istime: true,
+				istoday: false,
+				min: laydate.now(), //设定最小日期为当前日期
+				elem: '#hello', //目标元素。由于laydate.js封装了一个轻量级的选择器引擎，因此elem还允许你传入class、tag但必须按照这种方式 '#id .class'
+				event: 'focus' //响应事件。如果没有传入event，则按照默认的click
+			});
+		</script>
+		<table border="1px" id="table1">
+			<tr>
+				<th>B</th>
+				<th>I</th>
+				<th>N</th>
+				<th>G</th>
+				<th>O</th>
+			</tr>
+			<tr>
+				<td id="square0"> </td>
+				<td id="square5"> </td>
+				<td id="square10"> </td>
+				<td id="square14"> </td>
+				<td id="square19"> </td>
+			</tr>
+			<tr>
+				<td id="square1"> </td>
+				<td id="square6"> </td>
+				<td id="square11"> </td>
+				<td id="square15"> </td>
+				<td id="square20"> </td>
+			</tr>
+			<tr>
+				<td id="square2"> </td>
+				<td id="square7"> </td>
+				<td id="free">Free</td>
+				<td id="square16"> </td>
+				<td id="square21"> </td>
+			</tr>
+			<tr>
+				<td id="square3"> </td>
+				<td id="square8"> </td>
+				<td id="square12"> </td>
+				<td id="square17"> </td>
+				<td id="square22"> </td>
+			</tr>
+			<tr>
+				<td id="square4"> </td>
+				<td id="square9"> </td>
+				<td id="square13"> </td>
+				<td id="square18"> </td>
+				<td id="square23"> </td>
+			</tr>
+		</table>
+		<p><a href="script01.html" id="reload">Click here</a> to create a new card</p>
+	</body>
+
+</html>
+

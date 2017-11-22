@@ -1,0 +1,20 @@
+/*!
+* Copyright 2017-03-10
+* login and index styles
+*/
+
+/*!login*/
+.social-login > .btn{width:100%!important;}
+.form-group{height:65px;}
+.login-container{height:350px!important;}
+.login-container h1{color:#007aff; cursor: context-menu;}
+.pull-left{margin-top:25px;}
+.error{color:#d9534f}
+#gritter-notice-wrapper{width:230px;}  
+
+/*!index*/
+html,body{height:100%;}
+.iframe{width:100%; height:calc(100% - 47px); border:none;}
+h3{margin-top:0; margin-bottom:0; cursor: default;}
+.dropdown-menu{min-width:138px;}
+.nav-list>li.active:after{border-right:none;}

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cjj.dao.chargemanage.ChargeMapper" >
+  <resultMap id="BaseResultMap" type="com.cjj.po.Charge" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="prescriptionid" property="prescriptionid" jdbcType="INTEGER" />
+    <result column="receiptcode" property="receiptcode" jdbcType="VARCHAR" />
+    <result column="invoicecode" property="invoicecode" jdbcType="VARCHAR" />
+    <result column="chargestatus" property="chargestatus" jdbcType="INTEGER" />
+    <result column="discount" property="discount" jdbcType="INTEGER" />
+    <result column="privilege" property="privilege" jdbcType="INTEGER" />
+    <result column="beforereceivable" property="beforereceivable" jdbcType="DECIMAL" />
+    <result column="afterreceivable" property="afterreceivable" jdbcType="DECIMAL" />
+    <result column="medicarecanpay" property="medicarecanpay" jdbcType="DECIMAL" />
+    <result column="cost" property="cost" jdbcType="DECIMAL" />
+    <result column="operationpersonid" property="operationpersonid" jdbcType="INTEGER" />
+    <result column="chargetime" property="chargetime" jdbcType="TIMESTAMP" />
+    <result column="isvalid" property="isvalid" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, prescriptionid, receiptcode, invoicecode, chargestatus, discount, privilege, 
+    beforereceivable, afterreceivable, medicarecanpay, cost, operationpersonid, chargetime, 
+    isvalid
+  </sql>
+  
+  <!-- 分页查询历史记录 -->
+  <select id="manyConditionsFindHistory" resultType="com.cjj.vo.ChargeVo">
+  	SELECT c.*,p.prescriptioncode,pt.*,e.employeename AS doctorname,e1.employeename AS operationpersonname,
+	d.departmentname,a.detailname AS insuretypename FROM charge c INNER JOIN prescription p ON p.id = c.prescriptionid 
+	LEFT JOIN register r ON r.id = p.registerid LEFT JOIN patient pt ON pt.id = r.patientid LEFT JOIN employee e 
+	ON e.id = r.doctorid LEFT JOIN employee e1 ON e1.id = c.operationpersonid LEFT JOIN department d 
+	ON d.id = r.departmentid LEFT JOIN attributedetail a ON a.id = pt.insuretypeid
+	WHERE c.isvalid = 1 AND LOCATE(#{vo.prescriptioncode,jdbcType=VARCHAR},p.prescriptioncode) AND 
+	LOCATE(#{vo.cardcode,jdbcType=VARCHAR},pt.cardcode) AND LOCATE(#{vo.patientname,jdbcType=VARCHAR},pt.patientname) AND 
+	LOCATE(CASE WHEN #{vo.operationpersonid,jdbcType=INTEGER} = 0 THEN '' ELSE #{vo.operationpersonid,jdbcType=INTEGER} END,
+	c.operationpersonid) AND
+	UNIX_TIMESTAMP(c.chargetime) &gt;= UNIX_TIMESTAMP(CASE WHEN #{vo.begintime,jdbcType=VARCHAR} = '' THEN 
+	c.chargetime ELSE #{vo.begintime,jdbcType=VARCHAR} END) AND 
+	UNIX_TIMESTAMP (c.chargetime) &lt;= UNIX_TIMESTAMP(CASE WHEN #{vo.endtime,jdbcType=VARCHAR} = '' THEN 
+	c.chargetime ELSE DATE_ADD(#{vo.endtime,jdbcType=VARCHAR},INTERVAL 1 DAY) END) ORDER BY c.id DESC 
+	<if test="currentpage==0">
+		limit 0, #{pagesize,jdbcType=INTEGER}
+	</if>
+	<if test="currentpage&gt;0">
+		limit ${(currentpage-1)*pagesize},${pagesize}
+	</if>
+  </select>
+  <select id="findLast" resultType="com.cjj.vo.ChargeVo">
+  	SELECT c.*,pt.patientname,e.employeename AS operationpersonname,COUNT(c.id) AS totalcount,SUM(c.cost) AS totalsum 
+	FROM charge c INNER JOIN prescription p ON p.id = c.prescriptionid LEFT JOIN register r ON r.id = p.registerid 
+	LEFT JOIN patient pt ON pt.id = r.patientid LEFT JOIN employee e ON e.id = c.operationpersonid 
+	WHERE c.isvalid = 1 ORDER BY c.id DESC LIMIT 1
+  </select>
+  <update id="delete" parameterType="java.lang.Integer">
+  	UPDATE charge SET isvalid = 2 WHERE id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from charge
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <insert id="insert" parameterType="com.cjj.po.Charge" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into charge (prescriptionid, receiptcode, invoicecode, 
+      chargestatus, discount, privilege, 
+      beforereceivable, afterreceivable, medicarecanpay, 
+      cost, operationpersonid, chargetime, 
+      isvalid)
+    values (#{prescriptionid,jdbcType=INTEGER}, #{receiptcode,jdbcType=VARCHAR}, #{invoicecode,jdbcType=VARCHAR}, 
+      #{chargestatus,jdbcType=INTEGER}, #{discount,jdbcType=INTEGER}, #{privilege,jdbcType=INTEGER}, 
+      #{beforereceivable,jdbcType=DECIMAL}, #{afterreceivable,jdbcType=DECIMAL}, #{medicarecanpay,jdbcType=DECIMAL}, 
+      #{cost,jdbcType=DECIMAL}, #{operationpersonid,jdbcType=INTEGER}, #{chargetime,jdbcType=TIMESTAMP}, 
+      #{isvalid,jdbcType=INTEGER})
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cjj.po.Charge" >
+    update charge
+    <set >
+      <if test="prescriptionid != null" >
+        prescriptionid = #{prescriptionid,jdbcType=INTEGER},
+      </if>
+      <if test="receiptcode != null" >
+        receiptcode = #{receiptcode,jdbcType=VARCHAR},
+      </if>
+      <if test="invoicecode != null" >
+        invoicecode = #{invoicecode,jdbcType=VARCHAR},
+      </if>
+      <if test="chargestatus != null" >
+        chargestatus = #{chargestatus,jdbcType=INTEGER},
+      </if>
+      <if test="discount != null" >
+        discount = #{discount,jdbcType=INTEGER},
+      </if>
+      <if test="privilege != null" >
+        privilege = #{privilege,jdbcType=INTEGER},
+      </if>
+      <if test="beforereceivable != null" >
+        beforereceivable = #{beforereceivable,jdbcType=DECIMAL},
+      </if>
+      <if test="afterreceivable != null" >
+        afterreceivable = #{afterreceivable,jdbcType=DECIMAL},
+      </if>
+      <if test="medicarecanpay != null" >
+        medicarecanpay = #{medicarecanpay,jdbcType=DECIMAL},
+      </if>
+      <if test="cost != null" >
+        cost = #{cost,jdbcType=DECIMAL},
+      </if>
+      <if test="operationpersonid != null" >
+        operationpersonid = #{operationpersonid,jdbcType=INTEGER},
+      </if>
+      <if test="chargetime != null" >
+        chargetime = #{chargetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isvalid != null" >
+        isvalid = #{isvalid,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

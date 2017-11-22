@@ -1,0 +1,20 @@
+a, a:link, a:visited, a:hover, a:active{text-decoration:none !important;}
+.btn-group>.btn>.caret {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    vertical-align: top;
+    border-top: 4px solid #000;
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
+    content: "";
+    margin-top: 8px;
+    margin-left: 0;
+}			
+.table .btn{width:auto; padding-left:0!important;}
+.btn.btn-link{color:#616161 !important;font-size:12px !important; padding:0 10px 0 0!important;}
+.btn-link:hover{color:#bd362f!important;}
+.dropdown-menu li a:hover{background-color:#2283c5!important;}
+.table > tbody > tr:hover {background:#f5f5f5;}
+.dropdown-menu{min-width:50px; width:auto;}
+.xz{background: rgba(68, 169, 255, 0.62) !important;}

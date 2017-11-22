@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cjj.dao.baseinfo.ChargetypeMapper" >
+  <resultMap id="BaseResultMap" type="com.cjj.po.Chargetype" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="typecode" property="typecode" jdbcType="VARCHAR" />
+    <result column="typename" property="typename" jdbcType="VARCHAR" />
+    <result column="itemmark" property="itemmark" jdbcType="VARCHAR" />
+    <result column="discount" property="discount" jdbcType="INTEGER" />
+    <result column="note" property="note" jdbcType="VARCHAR" />
+    <result column="isvalid" property="isvalid" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, typecode, typename, itemmark, discount, note, isvalid
+  </sql>
+  
+  <!-- 分页模糊查询 -->
+  <select id="vagueFind" resultType="com.cjj.po.Chargetype">
+  	SELECT * FROM chargetype WHERE isvalid = 1 AND (LOCATE(#{contant,jdbcType=VARCHAR},typecode)
+  	OR LOCATE(#{contant,jdbcType=VARCHAR},typename))
+  	<if test="currentpage==0">
+		limit 0, #{pagesize,jdbcType=INTEGER}
+	</if>
+	<if test="currentpage&gt;0">
+		limit ${(currentpage-1)*pagesize},${pagesize}
+	</if>
+  </select>
+  <select id="findAll" resultMap="BaseResultMap">
+  	SELECT * FROM chargetype WHERE isvalid = 1
+  </select>
+  <update id="delete" parameterType="java.lang.Integer">
+  	UPDATE chargetype SET isvalid = 2 WHERE id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from chargetype
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <insert id="insert" parameterType="com.cjj.po.Chargetype" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into chargetype (typecode, typename, itemmark, 
+      discount, note, isvalid
+      )
+    values (#{typecode,jdbcType=VARCHAR}, #{typename,jdbcType=VARCHAR}, #{itemmark,jdbcType=VARCHAR}, 
+      #{discount,jdbcType=INTEGER}, #{note,jdbcType=VARCHAR}, #{isvalid,jdbcType=INTEGER}
+      )
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cjj.po.Chargetype" >
+    update chargetype
+    <set >
+      <if test="typecode != null" >
+        typecode = #{typecode,jdbcType=VARCHAR},
+      </if>
+      <if test="typename != null" >
+        typename = #{typename,jdbcType=VARCHAR},
+      </if>
+      <if test="itemmark != null" >
+        itemmark = #{itemmark,jdbcType=VARCHAR},
+      </if>
+      <if test="discount != null" >
+        discount = #{discount,jdbcType=INTEGER},
+      </if>
+      <if test="note != null" >
+        note = #{note,jdbcType=VARCHAR},
+      </if>
+      <if test="isvalid != null" >
+        isvalid = #{isvalid,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
